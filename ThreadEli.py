@@ -84,7 +84,8 @@ class ElavatorThread2(threading.Thread):
         # 콜이 있는지 없는지 확인하는 것
         while (1):
 
-            if(self.elevator_rack.ready_calls[0] != None or len(self.dests) != 0):
+            #if(self.elevator_rack.ready_calls[0] != None or len(self.dests) != 0):
+            if(len(self.elevator_rack.ready_calls) != 0 or len(self.dests) != 0):
                 # print(self.elevator_rack.ready_calls[0].departure)
                 #  엘레베이터의 스테이트를 계속 확인하는 while문
                 # while(1):
@@ -103,7 +104,7 @@ class ElavatorThread2(threading.Thread):
                             # 목적콜들로 담는다 - 전체 관리하는 dests, 콜의 출발층만 관리 departure_floor, 콜의 목적층만 관리 destination_floor
                             self.dests.append(self.elevator_rack.ready_calls[0])
                             self.destination_floors.append(self.elevator_rack.ready_calls[0])
-                            self.departure_floors.append(self.elevator_rack.ready_calls.pop())
+                            self.departure_floors.append(self.elevator_rack.ready_calls.pop(0))
 
 
 
@@ -117,7 +118,10 @@ class ElavatorThread2(threading.Thread):
                             self.elevator_rack.direction = constant.UP_DIRECTION
                             self.dests.append(self.elevator_rack.ready_calls[0])
                             self.destination_floors.append(self.elevator_rack.ready_calls[0])
-                            self.departure_floors.append(self.elevator_rack.ready_calls.pop())
+                            print('self.elevator_rack' , self.elevator_rack.ready_calls[0].destination)
+                            self.departure_floors.append(self.elevator_rack.ready_calls.pop(0))
+
+                            # print('elevator pop :  ', self.elevator_rack.ready_calls[0].destination)
 
                             #self.dests.append(self.elevator_rack.ready_calls.pop())
                         # 나보다 아래면 내려간다
@@ -132,12 +136,12 @@ class ElavatorThread2(threading.Thread):
 
                             self.dests.append(self.elevator_rack.ready_calls[0])
                             self.destination_floors.append(self.elevator_rack.ready_calls[0])
-                            self.departure_floors.append(self.elevator_rack.ready_calls.pop())
+                            self.departure_floors.append(self.elevator_rack.ready_calls.pop(0))
 
                             #self.dests.append(self.elevator_rack.ready_calls.pop())
 
                     if(self.elevator_rack.state == constant.LOAD_STATE):
-                        print('____LOADSTATE_____')
+                        #print('____LOADSTATE_____')
                         ### 1. 레디콜스에 새 콜이 있자나 그 콜을 데스트에 들어갈 수 있는지 검사해서 담는다(departure, destination).
                         ### 2. 오름차순 또는 내림차순으로 정렬한다.
 
@@ -146,20 +150,22 @@ class ElavatorThread2(threading.Thread):
 
                         # 1. dests 에 콜이 없을 때는 readycalls 에서 제일 앞의 콜 객체를 데스트에 가지고 온다.
                         # ready_calls에 남아있니?
-                        if(self.elevator_rack.ready_calls != None): # ready_calls에 콜이 남아있으면 처리한다  : if(self.elevator_rack.ready_calls != None )
+                        #if(self.elevator_rack.ready_calls[0] != None): # ready_calls에 콜이 남아있으면 처리한다  : if(self.elevator_rack.ready_calls != None )
+                        if(len(self.elevator_rack.ready_calls) > 0):
                             if(self.dests == None): # dests배열이 너이면
                                 #제일 가까운 걸 가지고 온다.
                                 self.dests.append(self.elevator_rack.ready_calls[0]) # 일단은 0번콜
                             else:
                                 # 2. 콜이 있을때는, 방향 체크(엘레베이터의 방향 == ready_calls에서 막 가지고 온 그 콜) 같은방향, 진행방향보다 앞인 콜만 가지고 온다.
                                 # self.dests에 담는다
-                                if(self.elevator_rack.direction == self.elevator_rack.ready_calls[0].isup): # 그 콜의 방향이랑 엘베 방향이랑 같니?
+                                #print(' self.elevator.ready_calls[0] ::', self.elevator_rack.ready_calls[0].isup)
+                                if(self.elevator_rack.direction == self.dests[0].isup): #몰라 알수가없어 이렇게 ㅘㅏㅛㅓ러홍츠프ㅗ 그 콜의 방향이랑 엘베 방향이랑 같니?
                                     self.dests.append(self.elevator_rack.ready_calls[0])
                                     self.departure_floors.append(self.elevator_rack.ready_calls[0])
-                                    self.destination_floors.append(self.elevator_rack.ready_calls.pop())
+                                    self.destination_floors.append(self.elevator_rack.ready_calls.pop(0))
                                 else: #방향이 다를 때
                                     # 일단 맨 뒤로 보낼까
-                                    sendtoback = self.elevator_rack.ready_calls.pop()
+                                    sendtoback = self.elevator_rack.ready_calls.pop(0)
                                     self.elevator_rack.ready_calls.append(sendtoback)
 
                         elif(self.elevator_rack.ready_calls == None): # no
@@ -210,6 +216,7 @@ class ElavatorThread2(threading.Thread):
                         if(int(self.elevator_rack.floor) == self.destination_floor ):
                             print('ThreadEli :: arrived at calls departure floor ' )
                             print('ThreadEli :: people get in...')
+                            print('elevator current floor info :equal: ', self.elevator_rack.floor)
                             # 출발 목적층에 도착하였으니 멈춤 상태로 전환
                             self.elevator_rack.state = constant.STOP_STATE
 
@@ -229,19 +236,23 @@ class ElavatorThread2(threading.Thread):
 
                                     for j in range(0, len(self.dests)):
                                         if self.dests[j].register_time == self.destination_floors[i].register_time:
-                                            self.destination_floor.pop(i)
+                                            self.destination_floors.pop(i)
                                             self.dests.pop(j)
 
                             time.sleep(2)
 
-                            current_call = self.departure_floors.pop()
+                            current_call = self.departure_floors.pop(0)
 
 
 
-                        elif(int(self.elevator_rack.floor) <= int(self.destination_floor)):
+                        elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
 
                             time.sleep(1.33)
                             self.ui.up(1)
+                            self.elevator_rack.floor += 1
+
+                            print('elevator current floor info :lower: ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
+
                             self.elevator_rack.state = constant.LOAD_STATE
 
                             #destination_list.sort(key=asc_destlist, reverse=True)
@@ -251,9 +262,11 @@ class ElavatorThread2(threading.Thread):
 
                             #self.dests.append(self.elevator_rack.ready_calls.pop())
 
-                        elif(int(self.elevator_rack.floor) >= int(self.destination_floor)):
+                        elif(int(self.elevator_rack.floor) > int(self.destination_floor)):
                             time.sleep(1.33)
                             self.ui.down(1)
+                            self.elevator_rack.floor -= 1
+                            print('elevator current floor info :higher: ', self.elevator_rack.floor)
                             self.elevator_rack.state = constant.LOAD_STATE
                             # self.dests.append(self.elevator_rack.ready_calls.pop())
 
@@ -263,10 +276,10 @@ class ElavatorThread2(threading.Thread):
                             print('people get in…')
 
 
-                            time.sleep(2  )#가지고 온 사람 타는 시간만틈 더해서 슬립)
+                            time.sleep(2)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                             self.elevator_rack.state = constant.IDLE_STATE
 
-            elif(self.elevator_rack.ready_calls[0] == None or len(self.dests) == 0):
+            else:
                 self.elevator_rack.state = constant.IDLE_STATE
                 print('no value ')
 

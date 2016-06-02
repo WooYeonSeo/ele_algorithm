@@ -122,6 +122,8 @@ class Readcalls(threading.Thread):
                 print('floorterm :: when else: ', floor_term)
                 print('current_floor_term', self.current_floor_term)
 
+                #self.current_floor_term = floor_term  # 층 차이를 업데이트한다
+
                 if (floor_term < self.current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
                     self.current_floor_term = floor_term  # 층 차이를 업데이트한다
                     close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
@@ -129,4 +131,4 @@ class Readcalls(threading.Thread):
 
             print('readcalls.py : allocated elevator  :', close_ele)
 
-            return close_ele
+        return close_ele
