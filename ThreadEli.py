@@ -103,7 +103,7 @@ class ElavatorThread2(threading.Thread):
                             # 목적콜들로 담는다 - 전체 관리하는 dests, 콜의 출발층만 관리 departure_floor, 콜의 목적층만 관리 destination_floor
                             self.dests.append(self.elevator_rack.ready_calls[0])
                             self.destination_floors.append(self.elevator_rack.ready_calls[0])
-                            self.departure_floors.append(self.elevator_rack.ready_calls.pop)
+                            self.departure_floors.append(self.elevator_rack.ready_calls.pop())
 
 
 
@@ -117,7 +117,7 @@ class ElavatorThread2(threading.Thread):
                             self.elevator_rack.direction = constant.UP_DIRECTION
                             self.dests.append(self.elevator_rack.ready_calls[0])
                             self.destination_floors.append(self.elevator_rack.ready_calls[0])
-                            self.departure_floors.append(self.elevator_rack.ready_calls.pop)
+                            self.departure_floors.append(self.elevator_rack.ready_calls.pop())
 
                             #self.dests.append(self.elevator_rack.ready_calls.pop())
                         # 나보다 아래면 내려간다
@@ -132,7 +132,7 @@ class ElavatorThread2(threading.Thread):
 
                             self.dests.append(self.elevator_rack.ready_calls[0])
                             self.destination_floors.append(self.elevator_rack.ready_calls[0])
-                            self.departure_floors.append(self.elevator_rack.ready_calls.pop)
+                            self.departure_floors.append(self.elevator_rack.ready_calls.pop())
 
                             #self.dests.append(self.elevator_rack.ready_calls.pop())
 
@@ -156,10 +156,10 @@ class ElavatorThread2(threading.Thread):
                                 if(self.elevator_rack.direction == self.elevator_rack.ready_calls[0].isup): # 그 콜의 방향이랑 엘베 방향이랑 같니?
                                     self.dests.append(self.elevator_rack.ready_calls[0])
                                     self.departure_floors.append(self.elevator_rack.ready_calls[0])
-                                    self.destination_floors.append(self.elevator_rack.ready_calls.pop)
+                                    self.destination_floors.append(self.elevator_rack.ready_calls.pop())
                                 else: #방향이 다를 때
                                     # 일단 맨 뒤로 보낼까
-                                    sendtoback = self.elevator_rack.ready_calls.pop
+                                    sendtoback = self.elevator_rack.ready_calls.pop()
                                     self.elevator_rack.ready_calls.append(sendtoback)
 
                         elif(self.elevator_rack.ready_calls == None): # no
@@ -193,9 +193,9 @@ class ElavatorThread2(threading.Thread):
 
                         # destination_floors 와 departure_floors[0]을 비교해서 더 작은 게 self.destination_floor의 값이다.
                         if(self.destination_floors[0] < self.departure_floors[0]):
-                            self.destination_floor = self.destination_floors[0]
+                            self.destination_floor = self.destination_floors[0].destination
                         else:
-                            self.destination_floor = self.departure_floors[0]
+                            self.destination_floor = self.departure_floors[0].departure
 
                          #if(self.departure_floors == self.departure_floors[0].departure):
                          #    self.destination_floor = self.departure_floors[0]
@@ -215,10 +215,23 @@ class ElavatorThread2(threading.Thread):
 
 
                             # departure_floors 검색해서 같은 값 삭제하고,
+                            #순차검색
+                            for i in range(0, len(self.departure_floors)):
+                                if self.departure_floors[i].departure == self.destination_floor:
+                                    self.departure_floors.pop(i)
+
+
+
 
                             # destination_floors 검색해서 같은 값 삭제하고, --> 이 때 dests 의 해당 콜을 삭제
+                            for i in range(0, len(self.destination_floors)):
+                                if self.destination_floors[i].departure == self.destination_floor:
 
-                            # destination까지 삭제되면 dests삭제.
+                                    for j in range(0, len(self.dests)):
+                                        if self.dests[j].register_time == self.destination_floors[i].register_time:
+                                            self.destination_floor.pop(i)
+                                            self.dests.pop(j)
+
                             time.sleep(2)
 
                             current_call = self.departure_floors.pop()
@@ -233,8 +246,8 @@ class ElavatorThread2(threading.Thread):
 
                             #destination_list.sort(key=asc_destlist, reverse=True)
                             # 지금 층이랑 디파처플로어 목록중에 출발층이랑 같니?
-                            for i in range(0,3):
-                                print('desti list : ' ,self.departure_floors[i].departure)
+                            #for i in range(0,3):
+                            #print('desti list : ' ,self.departure_floors[0].departure)
 
                             #self.dests.append(self.elevator_rack.ready_calls.pop())
 
@@ -247,7 +260,7 @@ class ElavatorThread2(threading.Thread):
                     # 사람을 태우려고 멈추었을 때. 또는 동작을 만족하였을때.
                     if(self.elevator_rack.state == constant.STOP_STATE):
                         if(int(self.elevator_rack.floor) == int(self.destination_floor)):
-                            print('people get in...')
+                            print('people get in…')
 
 
                             time.sleep(2  )#가지고 온 사람 타는 시간만틈 더해서 슬립)
@@ -322,6 +335,3 @@ class ElavatorThread4(threading.Thread):
 
     def run(self):
         print('thread 4 ')
-
-
-

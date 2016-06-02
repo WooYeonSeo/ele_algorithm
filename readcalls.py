@@ -16,6 +16,7 @@ class Readcalls(threading.Thread):
     def __init__(self, parent = None):
         threading.Thread.__init__(self)
         self.call_number = 0
+        self.current_floor_term = 20  # 층 차이값일단 최대로 줌
 
     def settn(self, tn):
         self.tn =tn
@@ -83,7 +84,7 @@ class Readcalls(threading.Thread):
         # 엘레베이터들의 위치를 가진다
 
         close_ele = 0  # 가장 가까운 엘레베이터 번호
-        current_floor_term = 20  # 층 차이값일단 최대로 줌
+
 
         # 각각의 엘리베이터들마다 상황을 비교한다
 
@@ -97,8 +98,8 @@ class Readcalls(threading.Thread):
                 # 층 차이
                 floor_term = int(call.departure) - int(self.elevator_rack[index].floor)
                 print('floorterm2 : ', floor_term)
-                if (floor_term < current_floor_term):
-                    current_floor_term = floor_term  # 층 차이를 업데이트한다
+                if (floor_term < self.current_floor_term):
+                    self.current_floor_term = floor_term  # 층 차이를 업데이트한다
                     close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
 
             # 내 콜이 내려가는콜이고 , 내위치보다 엘레베이터가 위에 있을 때
@@ -106,23 +107,23 @@ class Readcalls(threading.Thread):
                 # 층차이
                 floor_term = int(self.elevator_rack[index].floor) - int(call.departure)
                 print('floorterm 3: ', floor_term)
-                if (floor_term < current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
-                    current_floor_term = floor_term  # 층 차이를 업데이트한다
+                if (floor_term < self.current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
+                    self.current_floor_term = floor_term  # 층 차이를 업데이트한다
                     close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
             elif (self.elevator_rack[index].state ==  constant.IDLE_STATE ):
                 floor_term = abs(int(self.elevator_rack[index].floor) - int(call.departure))
                 print('floorterm 4: ', floor_term)
-                if (floor_term < current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
-                    current_floor_term = floor_term  # 층 차이를 업데이트한다
+                if (floor_term < self.current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
+                    self.current_floor_term = floor_term  # 층 차이를 업데이트한다
                     close_ele =  index # 할당하는 엘레베이터 번호를 바꾼다.
             else:
                 floor_term = abs(int(self.elevator_rack[index].floor) - int( call.departure))
 
-                print('floorterm 5: ', floor_term)
-                print('current_floor_term', current_floor_term)
+                print('floorterm :: when else: ', floor_term)
+                print('current_floor_term', self.current_floor_term)
 
-                if (floor_term < current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
-                    current_floor_term = floor_term  # 층 차이를 업데이트한다
+                if (floor_term < self.current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
+                    self.current_floor_term = floor_term  # 층 차이를 업데이트한다
                     close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
                     print('index : ', index)
 
