@@ -17,6 +17,7 @@ class Elevator:
         self.destination_list =[]
         self.destination = 0
 
+
         self.total_passenger_count = 0
         self.passengers_on_board = 0
         self.total_duration =0

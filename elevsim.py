@@ -8,7 +8,7 @@
 # sys.path.append("C:\Users\DS\PycharmProjects\untitled2\elevator_algorithm")
 # import elevsim
 
-import ThreadEli
+import ThreadEli2
 import call as c
 import constant
 import dataParsing as gdata
@@ -20,6 +20,7 @@ import simulator
 class Elevsim(object):
     def __init__(self, ui,dialog):
         print("__elevsim__ \n")
+        self.current_floor_term = 20
         # self.ui = simulator.ui.getUI()
         self.ui = ui  # simulator.Ui_MainWindow()
         self.dialog = dialog # 다이얼로그 받아온다
@@ -103,24 +104,24 @@ class Elevsim(object):
 
 
     def runThread(self):
-        t1 = ThreadEli.ElavatorThread2()
+        t1 = ThreadEli2.ElavatorThread2()
         t1.setUI(self.ui)
         t1.setDasom(self.tn)
         t1.setDialog(self.dialog)
         t1.setElevator_rack(self.elevator_rack[0])
 
-        t2 = ThreadEli.ElavatorThread1()
+        t2 = ThreadEli2.ElavatorThread1()
         t2.setUI(self.ui)
         t2.setDasom(self.tn)
         t2.setDialog(self.dialog)
         t2.setElevator_rack(self.elevator_rack[1])
 
-        t3 = ThreadEli.ElavatorThread3()
+        t3 = ThreadEli2.ElavatorThread3()
         t3.setUI(self.ui)
         t3.setDasom(self.tn)
         t3.setDialog(self.dialog)
 
-        t4 = ThreadEli.ElavatorThread4()
+        t4 = ThreadEli2.ElavatorThread4()
         t4.setUI(self.ui)
         t4.setDasom(self.tn)
         t4.setDialog(self.dialog)
@@ -173,7 +174,7 @@ class Elevsim(object):
              - 15초에 2층 (다운)콜발생 - 이거는 할당한다
         """
         close_ele = 0  # 가장 가까운 엘레베이터 번호
-        current_floor_term = 20  # 층 차이값일단 최대로 줌
+          # 층 차이값일단 최대로 줌
 
         # 각각의 엘리베이터들마다 상황을 비교한다
 
@@ -185,18 +186,18 @@ class Elevsim(object):
             elif (self.elevator_rack[index].floor < call.departure and call == 1):  # 1이 up, 0이 down
                 # 층 차이
                 floor_term = call.departure - self.elevator_rack[index].floor
-                if (floor_term < current_floor_term):
+                if (floor_term < self.current_floor_term):
                     current_floor_term = floor_term  # 층 차이를 업데이트한다
                     close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
             # 내 콜이 내려가는콜이고 , 내위치보다 엘레베이터가 위에 있을 때
             elif (call.departure < self.elevator_rack[index].floor and call == 0):
                 # 층차이
                 floor_term = self.elevator_rack[index].floor - call.departure
-                if (floor_term < current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
+                if (floor_term < self.current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
                     current_floor_term = floor_term  # 층 차이를 업데이트한다
                     close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
 
-            print('할당할 가장 가까운 엘베  :', close_ele)
+            print('closest elevator  :', close_ele)
             return close_ele
 
 
