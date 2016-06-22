@@ -28,7 +28,7 @@ print tupleNum #99
 
 
 
-with open('bulding-seoul-mytest-desc.csv', 'rb') as csvfile:
+with open('bulding-seoul-mytest.csv', 'rb') as csvfile:
 
     #속성 배열
     attrArr = []
@@ -53,8 +53,8 @@ with open('bulding-seoul-mytest-desc.csv', 'rb') as csvfile:
     #registertime_5min
 
 
-    #attrRow = csvfile.readline().replace('"','').split(';')
-    attrRow = csvfile.readline().replace('"','').split(',')
+    attrRow = csvfile.readline().replace('"','').split(';')
+    #attrRow = csvfile.readline().replace('"','').split(',')
     for attr in attrRow:
         print attr
         attrArr.append(attr)
@@ -75,8 +75,8 @@ with open('bulding-seoul-mytest-desc.csv', 'rb') as csvfile:
 
     #tuple길이 배열
     for i in range(0,tupleNum):
-        #nowRow = csvfile.readline().replace('"','').split(';')
-        nowRow = csvfile.readline().replace('"','').split(',')
+        nowRow = csvfile.readline().replace('"','').split(';')
+        #nowRow = csvfile.readline().replace('"','').split(',')
 
         #속성크기만큼 for
         for j in range(0,len(attrArr)):
@@ -95,6 +95,24 @@ def getData(tn):
 
 
 
+
+def generateData(yearText,monthText,dayText,hourText,minuteText,secondText):
+
+    da = 0
+
+    #tuple±?¿? π?ø≠
+    for i in range(0,tupleNum):
+        # milisecond π?∏Æ±?
+        dateSplit = dataSet[i][0].split('.')
+        print dateSplit[0]
+
+        registertime = datetime.datetime.strptime(dateSplit[0], "%Y-%m-%d %H:%M:%S")
+
+        if registertime.year == int(yearText) and registertime.month == int(monthText) and registertime.day == int(dayText) and registertime.hour == int(hourText) and registertime.minute == int(minuteText) and registertime.second == int(secondText):
+            da = i
+
+    return da
+"""
 
 def generateData(ui):
 
@@ -118,6 +136,6 @@ def generateData(ui):
 
 
 
-
+"""
 
 

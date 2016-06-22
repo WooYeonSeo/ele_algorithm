@@ -15,6 +15,7 @@ except AttributeError:
         return QtGui.QApplication.translate(context, text, disambig)
 
 import simulator
+import getui
 import dialog
 import dataParsing
 import stopwatch
@@ -32,7 +33,13 @@ if __name__ == "__main__":
 
 
     ui = simulator.Ui_MainWindow(dia)
+
     ui.setupUi(MainWindow)
     MainWindow.show()
+    get = getui.Getui()
+    get.setui(ui)
+
+
+
 
     sys.exit(app.exec_())

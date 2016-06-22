@@ -18,7 +18,7 @@ import threading
 
 import elevatorMove as eleMove
 
-import ThreadEli2
+import ThreadEli
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
