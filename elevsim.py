@@ -79,7 +79,7 @@ class Elevsim(object):
         self.elevator_calls.append(first_call)
         # 어느 엘리베이터에 할당할지를 고른다
 
-        allocated_elevator = int(self.allocate(first_call))
+        allocated_elevator = int(self.allocate2(first_call))
         # 할당 될 엘리베이터에 첫 콜을 레디리스트에 추가해 준다.
         self.elevator_rack[allocated_elevator].ready_calls.append(first_call)
 
@@ -104,6 +104,7 @@ class Elevsim(object):
 
 
     def runThread(self):
+
         t1 = ThreadEli2.ElavatorThread2()
         t1.setUI(self.ui)
         t1.setDasom(self.tn)
@@ -120,11 +121,13 @@ class Elevsim(object):
         t3.setUI(self.ui)
         t3.setDasom(self.tn)
         t3.setDialog(self.dialog)
+        t3.setElevator_rack(self.elevator_rack[2])
 
         t4 = ThreadEli2.ElavatorThread4()
         t4.setUI(self.ui)
         t4.setDasom(self.tn)
         t4.setDialog(self.dialog)
+        t4.setElevator_rack(self.elevator_rack[3])
 
         t1.start()
         t2.start()
@@ -159,6 +162,41 @@ class Elevsim(object):
         return new_call
 
 
+    # allocate for one by one
+    def allocate2(self, call):
+        # 엘레베이터들의 위치를 가진다
+
+        close_ele = 0  # 가장 가까운 엘레베이터 번호
+          # 층 차이값일단 최대로 줌
+
+        # 각각의 엘리베이터들마다 상황을 비교한다
+
+        for index in range(0, constant.MAX_ELEVATORS):
+            if (int(self.elevator_rack[index].floor) == call.departure):
+                print('check1   :', close_ele)
+                close_ele = index
+                # self.elevator_rack[index].state = constant.LOAD_STATE  # 이거 다시 해야됨 아무튼 태운다는 뜻입니다
+            # 엘베 위치가 나의 출발층보다 아래이고  call이 위로 올라가는 콜이면 할당리스트에 넣겠다.
+            elif (int(self.elevator_rack[index].floor) < call.departure and (call.isup) == 't'):  # 1이 up, 0이 down
+                # 층 차이
+                print('check2   :', close_ele)
+                floor_term = int(call.departure) - int(self.elevator_rack[index].floor)
+                if (floor_term < self.current_floor_term):
+                    self.current_floor_term = floor_term  # 층 차이를 업데이트한다
+                    close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
+            # 내 콜이 내려가는콜이고 , 내위치보다 엘레베이터가 위에 있을 때
+            elif (call.departure < int(self.elevator_rack[index].floor) and (call.isup) == 'f'):
+                # 층차이
+                print('check3   :', close_ele)
+                floor_term = int(self.elevator_rack[index].floor) - int(call.departure)
+                if (floor_term < self.current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
+                    self.current_floor_term = floor_term  # 층 차이를 업데이트한다
+                    close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
+
+        print('closest elevator  :', close_ele)
+        return close_ele
+
+
 
 
 
@@ -181,10 +219,11 @@ class Elevsim(object):
         for index in range(0, constant.MAX_ELEVATORS):
             if (self.elevator_rack[index].floor == call.departure):
                 close_ele = index
-                self.elevator_rack[index].state = constant.LOAD_STATE  # 이거 다시 해야됨 아무튼 태운다는 뜻입니다
+                # self.elevator_rack[index].state = constant.LOAD_STATE  # 이거 다시 해야됨 아무튼 태운다는 뜻입니다
             # 엘베 위치가 나의 출발층보다 아래이고  call이 위로 올라가는 콜이면 할당리스트에 넣겠다.
             elif (self.elevator_rack[index].floor < call.departure and call == 1):  # 1이 up, 0이 down
                 # 층 차이
+
                 floor_term = call.departure - self.elevator_rack[index].floor
                 if (floor_term < self.current_floor_term):
                     current_floor_term = floor_term  # 층 차이를 업데이트한다

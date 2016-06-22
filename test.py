@@ -17,13 +17,22 @@ destination_list.append(c)
 
 def asc_deplist(list):
     return list.departure
-
-
+i =0
+for index in range(0, 4):#constant.MAX_ELEVATORS
+    print(index ,'__')
+    if index<2:
+        i =index
+    else:
+        print(i)
 
 destination_list.sort(key=asc_destlist, reverse=True)
 
 for i in range(0,4):
-    print('desti list : ' ,destination_list[i].destination)
+    if i==1:
+        print('dfd 1 is')
+    else:
+        print(i)
+
 
 print('popped', destination_list.pop(0))
 
@@ -32,12 +41,12 @@ for i in range(0,3):
 
 
 destination_list.sort(key=asc_deplist, reverse=True)
-
+"""
 for i in range(0,3):
     print(' desti list : ' ,destination_list[i].departure)
 
     self.elevator_rack.ready_calls.pop(0)
-
+"""
 """
 i = 0
 while(i<6):
