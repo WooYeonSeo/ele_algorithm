@@ -43,7 +43,7 @@ class Readcalls(threading.Thread):
             if self.tn <100:
                 #dataSplit = gdata.dataSet[self.tn][0].split('.')
                 registertime = gdata.getData(self.tn) # gdata.datetime.datetime.strptime(dataSplit[0],"%Y-%m-%d %H:%M:%S")
-                registertime2 = gdata.getData(self.tn+1)
+
 
                 if self.dialog.timer[2] == registertime.second and self.dialog.timer[1] == registertime.minute and self.dialog.timer[0] == registertime.hour:
                     call = self.getcall(self.tn)  # 시간 같으면 콜을 발생시킨다.
@@ -70,10 +70,7 @@ class Readcalls(threading.Thread):
 
         # tn = 투플넘버를가지고 옵시다 - dataparsing에 접근
         registertime = gdata.getData(tn)
-        # 해당 투플 (= 콜) 생성시 들어가는 데이터를 읽어온다 - 보기 좋으라고 이렇게 해놈
-        # 해당 투플 (= 콜) 생성시 들어가는 데이터를 읽어온다 - 보기 좋으라고 이렇게 해놈
 
-        # registertime,dbn_registertime,departurefloor,destinationfloor,isup,registertime_dayofweek,iserroroccured,weekend,registertime_15min
         departure_floor = gdata.dataSet[tn][2]
         destination_floor = gdata.dataSet[tn][3]
         # iserroroccured = gdata.dataSet[tn][13]
@@ -115,35 +112,32 @@ class Readcalls(threading.Thread):
         # for i in range(0,4):
         for index in range(0, 4):#constant.MAX_ELEVATORS
         #while(index < 4):
-            print(index)
+
             if (int(self.elevator_rack[index].floor) == call.departure):
-                print('check1   :', close_ele)
+
                 close_ele = index
                 # self.elevator_rack[index].state = constant.LOAD_STATE  # 이거 다시 해야됨 아무튼 태운다는 뜻입니다
             # 엘베 위치가 나의 출발층보다 아래이고  call이 위로 올라가는 콜이면 할당리스트에 넣겠다.
-            elif (int(self.elevator_rack[index].floor) < call.departure and (call.isup) == 't' ):  # 1이 up, 0이 down
+            elif(self.elevator_rack[index].state == constant.IDLE_STATE):
+                close_ele = index
+            elif (int(self.elevator_rack[index].floor) < call.departure and (call.isup) == 1 ):  # 1이 up, 0이 down
                 # 층 차이
                 floor_term = abs(int(call.departure) - int(self.elevator_rack[index].floor))
-                print('check2   :', close_ele , 'floor_term', floor_term, 'current_floor_term : ', self.current_floor_term)
+
                 if (floor_term < self.current_floor_term):
-                    print('check2_1   :', floor_term, 'index : ',index)
+
                     self.current_floor_term = floor_term  # 층 차이를 업데이트한다
                     close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
             # 내 콜이 내려가는콜이고 , 내위치보다 엘레베이터가 위에 있을 때
-            elif (call.departure < int(self.elevator_rack[index].floor) and (call.isup) == 'f'):
+            elif (call.departure < int(self.elevator_rack[index].floor) and (call.isup) == 0):
                 # 층차이
 
                 floor_term = abs(int(self.elevator_rack[index].floor) - int(call.departure))
-                print('check3   :', floor_term)
+
                 if (floor_term < self.current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
                     self.current_floor_term = floor_term  # 층 차이를 업데이트한다
                     close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
-            else:
-                print('im else in allocate2')
 
-
-
-        print('closest elevator  :', close_ele, 'index  :', index)
         return close_ele
 
 

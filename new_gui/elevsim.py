@@ -120,13 +120,13 @@ class Elevsim(object):
 
     def runThread(self):
 
-        t1 = ThreadEli2.ElavatorThread2()
+        t1 = ThreadEli2.ElavatorThread1()
         t1.setUI(self.ui)
         t1.setDasom(self.tn)
         t1.setDialog(self.dialog)
         t1.setElevator_rack(self.elevator_rack[0])
 
-        t2 = ThreadEli2.ElavatorThread1()
+        t2 = ThreadEli2.ElavatorThread2()
         t2.setUI(self.ui)
         t2.setDasom(self.tn)
         t2.setDialog(self.dialog)
@@ -184,7 +184,7 @@ class Elevsim(object):
         new_call = c.Call(registertime, departure_floor, destination_floor, is_up, passenger, dbn_register_time,day_of_week,iserror,weekend, register15min)  # 1이 up, 0이 down
         #new_call = c.Call(registertime, departure_floor, destination_floor, is_up, passenger)  # 1이 up, 0이 down
         self.elevator_calls.append(new_call)
-        print('departure_floor : ',new_call.departure, 'isup? :' ,new_call.isup)
+        print('departure_floor : ',new_call.departure )
         self.elevator_calls.append(new_call)  # 나중에 waitingtime 계산할때 쓸라고 배열에 담아놓는다.
 
 
@@ -206,7 +206,7 @@ class Elevsim(object):
                 close_ele = index
                 # self.elevator_rack[index].state = constant.LOAD_STATE  # 이거 다시 해야됨 아무튼 태운다는 뜻입니다
             # 엘베 위치가 나의 출발층보다 아래이고  call이 위로 올라가는 콜이면 할당리스트에 넣겠다.
-            elif (int(self.elevator_rack[index].floor) < call.departure and (call.isup) == 't'):  # 1이 up, 0이 down
+            elif (int(self.elevator_rack[index].floor) < call.departure and int(call.isup) == 1):  # 1이 up, 0이 down
                 # 층 차이
                 print('check2   :', close_ele)
                 floor_term = int(call.departure) - int(self.elevator_rack[index].floor)
@@ -214,7 +214,7 @@ class Elevsim(object):
                     self.current_floor_term = floor_term  # 층 차이를 업데이트한다
                     close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
             # 내 콜이 내려가는콜이고 , 내위치보다 엘레베이터가 위에 있을 때
-            elif (call.departure < int(self.elevator_rack[index].floor) and (call.isup) == 'f'):
+            elif (call.departure < int(self.elevator_rack[index].floor) and int(call.isup) == 0):
                 # 층차이
                 print('check3   :', close_ele)
                 floor_term = int(self.elevator_rack[index].floor) - int(call.departure)

@@ -94,6 +94,17 @@ def getData(tn):
     return registertime
 
 
+def getRE(tn):
+
+
+    dateSplit = dataSet[tn][0].split('.')
+
+    registertime = datetime.datetime.strptime(dateSplit[0], "%Y-%m-%d %H:%M:%S")
+
+
+    return registertime
+
+
 
 
 def generateData(yearText,monthText,dayText,hourText,minuteText,secondText):

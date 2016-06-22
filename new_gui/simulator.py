@@ -512,23 +512,37 @@ class Ui_MainWindow(object):
 
     def up(self, eleNum):
         if eleNum == 1:
-            self.car1.move(self.car1.x(),self.car1.y()-self.car1.height())
+            self.car1.move(self.car1.x(),self.car1.y()-self.car1.height()+0.3)
         if eleNum == 2:
-            self.car2.move(self.car2.x(),self.car2.y()-self.car2.height())
+            self.car2.move(self.car2.x(),self.car2.y()-self.car2.height()+0.5)
         if eleNum == 3:
-            self.car3.move(self.car3.x(),self.car3.y()-self.car3.height())
+            self.car3.move(self.car3.x(),self.car3.y()-self.car3.height()+0.7)
         if eleNum == 4:
-            self.car4.move(self.car4.x(),self.car4.y()-self.car4.height())
+            self.car4.move(self.car4.x(),self.car4.y()-self.car4.height()+1)
 
     def down(self,eleNum):
         if eleNum == 1:
-            self.car1.move(self.car1.x(),self.car1.y()+self.car1.height())
+            self.car1.move(self.car1.x(),self.car1.y()+self.car1.height()-0.3)
         if eleNum == 2:
-            self.car2.move(self.car2.x(),self.car2.y()+self.car2.height())
+            self.car2.move(self.car2.x(),self.car2.y()+self.car2.height()-0.5)
         if eleNum == 3:
-            self.car3.move(self.car3.x(),self.car3.y()+self.car3.height())
+            self.car3.move(self.car3.x(),self.car3.y()+self.car3.height()-0.7)
         if eleNum == 4:
-            self.car4.move(self.car4.x(),self.car4.y()+self.car4.height())
+            self.car4.move(self.car4.x(),self.car4.y()+self.car4.height()-1)
+
+    def waiting(self,index,sec):
+        if(index == 0):
+            self.ele1_waitingtime = sec
+            self.car1WaitingTime.setText( str(self.ele1_waitingtime) )
+        if(index == 1):
+            self.ele2_waitingtime = sec
+            self.car2WaitingTime.setText( str(self.ele2_waitingtime) )
+        if(index == 2):
+            self.ele3_waitingtime = sec
+            self.car3WaitingTime.setText( str(self.ele3_waitingtime))
+        if(index == 3):
+            self.ele4_waitingtime = sec
+            self.car4WaitingTime.setText( str(self.ele4_waitingtime))
 
     def toggle(self):
 

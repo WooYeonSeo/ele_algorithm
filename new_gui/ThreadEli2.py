@@ -4,6 +4,7 @@ import getui
 import simulator
 import time
 import constant
+import datetime
 
 def asc_destlist(list):
     return list.departure
@@ -25,6 +26,8 @@ class ElavatorThread1(threading.Thread):
         self.destination_floors = []
         self.call_number = 0
         self.destination_floor = 0
+
+        self.total_waiting =0
 
         #self.ui = getui.Getui()
 
@@ -66,7 +69,7 @@ class ElavatorThread1(threading.Thread):
                     #    print('one value : ', len(self.elevator_rack.ready_calls))
 
                     if(self.elevator_rack.state == constant.IDLE_STATE):
-                        print('____IDLE STATE___')
+                        print('____IDLE STATE___', self.elevator_rack.ready_calls[0].departure ,'->', self.elevator_rack.ready_calls[0].destination )
                         # 나보다 위에 층이면 올라간다
 
                         # 같은 충이면 태운다
@@ -123,18 +126,35 @@ class ElavatorThread1(threading.Thread):
 
                         # 로드스테이트여도 엘레베이터의 층과 콜의 0번의 출발층이 같으면 기다리면서
                         # 출발층에 에 해당하는 층에 도착했는가
-                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].departure) ):
+                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].departure) and self.elevator_rack.ready_calls[0].flag == 0 ):
                             print('ThreadEli2 :: arrived at calls departure floor ' )
                             print('ThreadEli2 :: people get in...')
                             print('elevator current floor info :equal: ', self.elevator_rack.floor)
                             # 출발 목적층에 도착하였으니 멈춤 상태로 전환
                             #self.elevator_rack.state = constant.STOP_STATE
                             # 사람이 타고 내리는 시간 sleep
+
+                            st = str(self.elevator_rack.ready_calls[0].register_time)
+                            print(st)
+                            dateSplit = st.split('.')
+                            registertime = datetime.datetime.strptime(dateSplit[0], "%Y-%m-%d %H:%M:%S")
+
+
+                            regist_sec = registertime.hour*3600 + registertime.minute *60 +registertime.second
+                            getin_sec = self.dialog.timer[2]  + self.dialog.timer[1] *60 + self.dialog.timer[0] * 3600
+
+                            self.elevator_rack.ready_calls[0].setwaiting(regist_sec,getin_sec)
+                            #self.elevator_rack.ready_calls[0].waiting
+                            self.total_waiting += getin_sec - regist_sec
+                            self.ui.waiting(0, self.total_waiting)
+
+
+                            self.elevator_rack.ready_calls[0].flag = 1
                             self.elevator_rack.state = constant.LOAD_STATE
                             self.destination_floor = self.elevator_rack.ready_calls[0].destination
                             time.sleep(2)
 
-                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].destination) ):
+                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].destination) and self.elevator_rack.ready_calls[0].flag == 1):
                             print('ThreadEli2 :: arrived at calls destination floor ' )
                             print('ThreadEli2 :: people get in and out...')
                             print('elevator current floor info :equal: ', self.elevator_rack.floor)
@@ -214,6 +234,7 @@ class ElavatorThread2(threading.Thread):
         #self.ui = getui.Getui()
 
         self.destination_floor = 0
+        self.total_waiting =0
 
     def setDasom(self, uidasom):
         self.dasom =uidasom
@@ -237,7 +258,6 @@ class ElavatorThread2(threading.Thread):
         print('thread 2 ')
         # 콜이 있는지 없는지 확인하는 것
         while (1):
-
             #if(self.elevator_rack.ready_calls[0] != None or len(self.dests) != 0):
             if(len(self.elevator_rack.ready_calls) != 0 ):
                 # print(self.elevator_rack.ready_calls[0].departure)
@@ -245,24 +265,26 @@ class ElavatorThread2(threading.Thread):
                 # while(1):
                     # 1. idle 일 때 - 첫번째 콜을 받아서 목적층 콜리스트에 넣고 운행상태로 바꾼다
                     # if( len(self.elevator_rack.ready_calls) == 1):
-                    #    print('one value : ', len(self.elevator_rack.ready_calls) )
+                    #    print('one value : ', len(self.elevator_rack.ready_calls))
 
                     if(self.elevator_rack.state == constant.IDLE_STATE):
-                        print('____IDLE STATE___')
+                        print('____IDLE STATE___', self.elevator_rack.ready_calls[0].departure ,'->', self.elevator_rack.ready_calls[0].destination )
+
                         # 나보다 위에 층이면 올라간다
 
                         # 같은 충이면 태운다
                         if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].departure)):
                             time.sleep(1.33)
-                            print('arrived to destination floor..')
+                            print('SAME STATE')
                             self.elevator_rack.state = constant.LOAD_STATE
-
-                            if( self.elevator_rack.ready_calls[0].isup == 't'):
+                            if( self.elevator_rack.ready_calls[0].isup == 1):
                                 self.elevator_rack.direction = constant.UP_DIRECTION # 1이 up 2 가 down
                             else:
                                 self.elevator_rack.direction = constant.DOWN_DIRECTION
 
+
                             # 목적층을 도착층으로 바꾼다.
+
                             self.destination_floor = self.elevator_rack.ready_calls[0].destination
 
 
@@ -280,9 +302,7 @@ class ElavatorThread2(threading.Thread):
                             #print('self.elevator_rack' , self.elevator_rack.ready_calls[0].destination)
                             self.destination_floor = self.elevator_rack.ready_calls[0].departure
 
-                            # print('elevator pop :  ', self.elevator_rack.ready_calls[0].destination)
 
-                            #self.dests.append(self.elevator_rack.ready_calls.pop())
                         # 나보다 아래면 내려가는 방향으로 설정
                         elif(int(self.elevator_rack.floor) > int(self.elevator_rack.ready_calls[0].departure)):
                             time.sleep(1)
@@ -306,21 +326,34 @@ class ElavatorThread2(threading.Thread):
 
                         # 로드스테이트여도 엘레베이터의 층과 콜의 0번의 출발층이 같으면 기다리면서
                         # 출발층에 에 해당하는 층에 도착했는가
-                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].departure) ):
-                            print('ThreadEli2 :: arrived at calls departure floor ' )
-                            print('ThreadEli2 :: people get in...')
-                            print('elevator current floor info :equal: ', self.elevator_rack.floor)
+                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].departure) and self.elevator_rack.ready_calls[0].flag == 0 ):
+
+                            print('ARRIVE DEPARTURE ', self.elevator_rack.floor)
                             # 출발 목적층에 도착하였으니 멈춤 상태로 전환
                             #self.elevator_rack.state = constant.STOP_STATE
                             # 사람이 타고 내리는 시간 sleep
+                            st = str(self.elevator_rack.ready_calls[0].register_time)
+                            print(st)
+                            dateSplit = st.split('.')
+                            registertime = datetime.datetime.strptime(dateSplit[0], "%Y-%m-%d %H:%M:%S")
+
+
+                            regist_sec = registertime.hour*3600 + registertime.minute *60 +registertime.second
+                            getin_sec = self.dialog.timer[2]  + self.dialog.timer[1] *60 + self.dialog.timer[0] * 3600
+
+                            self.elevator_rack.ready_calls[0].setwaiting(regist_sec,getin_sec)
+                            #self.elevator_rack.ready_calls[0].waiting
+                            self.total_waiting += getin_sec - regist_sec
+                            self.ui.waiting(1, self.total_waiting)
+
+                            self.elevator_rack.ready_calls[0].flag =1
                             self.elevator_rack.state = constant.LOAD_STATE
                             self.destination_floor = self.elevator_rack.ready_calls[0].destination
                             time.sleep(2)
 
-                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].destination) ):
-                            print('ThreadEli2 :: arrived at calls destination floor ' )
-                            print('ThreadEli2 :: people get in and out...')
-                            print('elevator current floor info :equal: ', self.elevator_rack.floor)
+                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].destination) and self.elevator_rack.ready_calls[0].flag == 1):
+
+                            print('ARRIVE DESTINATION ', self.elevator_rack.floor)
                             # 제일 앞에 꺼 제거거
 
 
@@ -336,12 +369,10 @@ class ElavatorThread2(threading.Thread):
                         elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
 
                             time.sleep(1.33)
-
-                            # getui.Getui.goup(2)
                             self.ui.up(2)
                             self.elevator_rack.floor += 1
 
-                            print('elevator current floor info :lower: ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
+                            print('UP: ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
 
                             self.elevator_rack.state = constant.LOAD_STATE
 
@@ -356,14 +387,17 @@ class ElavatorThread2(threading.Thread):
                             time.sleep(1.33)
                             self.ui.down(2)
                             self.elevator_rack.floor -= 1
-                            print('elevator current floor info :higher: ', self.elevator_rack.floor)
+                            print('DOWN ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
                             self.elevator_rack.state = constant.LOAD_STATE
                             # self.dests.append(self.elevator_rack.ready_calls.pop())
 
                     # 사람을 태우려고 멈추었을 때. 또는 동작을 만족하였을때.
                     if(self.elevator_rack.state == constant.STOP_STATE):
-                        print('people get in…')
+                        print('CLEAR')
                         self.elevator_rack.ready_calls.pop(0)
+                        # 시간 가지고 와서 - + 10분
+
+                        # 10 분 을 그 시간에 더해주고 그 사이에 콜이 있는지 검사
 
 
                         time.sleep(2)#가지고 온 사람 타는 시간만틈 더해서 슬립)
@@ -371,7 +405,11 @@ class ElavatorThread2(threading.Thread):
 
             else:
                 self.elevator_rack.state = constant.IDLE_STATE
+                # 여기에서 시간이 십분이 넘으면 안되는거잖
+                # if - 더하기 10분 한 그 시간보다
+                # 그 시간이 지나면 - > 딥러닝 알고리즘을 빠지면
                 # print('no value ')
+
 
 
 
@@ -394,6 +432,8 @@ class ElavatorThread3(threading.Thread):
         #self.ui =getui.Getui()
         self.destination_floor = 0
 
+        self.total_waiting =0
+
     def setDasom(self, uidasom):
         self.dasom =uidasom
 
@@ -427,7 +467,7 @@ class ElavatorThread3(threading.Thread):
                     #    print('one value : ', len(self.elevator_rack.ready_calls) )
 
                     if(self.elevator_rack.state == constant.IDLE_STATE):
-                        print('____IDLE STATE___')
+                        print('____IDLE STATE___', self.elevator_rack.ready_calls[0].departure ,'->', self.elevator_rack.ready_calls[0].destination )
                         # 나보다 위에 층이면 올라간다
 
                         # 같은 충이면 태운다
@@ -484,7 +524,7 @@ class ElavatorThread3(threading.Thread):
 
                         # 로드스테이트여도 엘레베이터의 층과 콜의 0번의 출발층이 같으면 기다리면서
                         # 출발층에 에 해당하는 층에 도착했는가
-                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].departure) ):
+                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].departure) and self.elevator_rack.ready_calls[0].flag == 0 ):
                             print('ThreadEli2 :: arrived at calls departure floor ' )
                             print('ThreadEli2 :: people get in...')
                             print('elevator current floor info :equal: ', self.elevator_rack.floor)
@@ -492,10 +532,26 @@ class ElavatorThread3(threading.Thread):
                             #self.elevator_rack.state = constant.STOP_STATE
                             # 사람이 타고 내리는 시간 sleep
                             self.elevator_rack.state = constant.LOAD_STATE
+
+                            st = str(self.elevator_rack.ready_calls[0].register_time)
+                            print(st)
+                            dateSplit = st.split('.')
+                            registertime = datetime.datetime.strptime(dateSplit[0], "%Y-%m-%d %H:%M:%S")
+
+
+                            regist_sec = registertime.hour*3600 + registertime.minute *60 +registertime.second
+                            getin_sec = self.dialog.timer[2]  + self.dialog.timer[1] *60 + self.dialog.timer[0] * 3600
+
+                            self.elevator_rack.ready_calls[0].setwaiting(regist_sec,getin_sec)
+                            #self.elevator_rack.ready_calls[0].waiting
+                            self.total_waiting += getin_sec - regist_sec
+                            self.ui.waiting(2, self.total_waiting)
+                            self.elevator_rack.ready_calls[0].flag = 1
+
                             self.destination_floor = self.elevator_rack.ready_calls[0].destination
                             time.sleep(2)
 
-                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].destination) ):
+                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].destination) and self.elevator_rack.ready_calls[0].flag == 1):
                             print('ThreadEli2 :: arrived at calls destination floor ' )
                             print('ThreadEli2 :: people get in and out...')
                             print('elevator current floor info :equal: ', self.elevator_rack.floor)
@@ -569,6 +625,8 @@ class ElavatorThread4(threading.Thread):
         self.destination_floors = []
         self.call_number = 0
         self.destination_floor = 0
+
+        self.total_waiting = 0
         #self.ui = getui.Getui()
 
     def setDasom(self, uidasom):
@@ -604,7 +662,7 @@ class ElavatorThread4(threading.Thread):
                     #    print('one value : ', len(self.elevator_rack.ready_calls) )
 
                     if(self.elevator_rack.state == constant.IDLE_STATE):
-                        print('____IDLE STATE___')
+                        print('____IDLE STATE___', int(self.elevator_rack.ready_calls[0].departure) ,'->', int(self.elevator_rack.ready_calls[0].destination) )
                         # 나보다 위에 층이면 올라간다
 
                         # 같은 충이면 태운다
@@ -662,18 +720,38 @@ class ElavatorThread4(threading.Thread):
 
                         # 로드스테이트여도 엘레베이터의 층과 콜의 0번의 출발층이 같으면 기다리면서
                         # 출발층에 에 해당하는 층에 도착했는가
-                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].departure) ):
+                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].departure) and self.elevator_rack.ready_calls[0].flag == 0 ):
+                            # flag가 0이면 도착층 안들린거
                             print('ThreadEli2 :: arrived at calls departure floor ' )
                             print('ThreadEli2 :: people get in...')
                             print('elevator current floor info :equal: ', self.elevator_rack.floor)
                             # 출발 목적층에 도착하였으니 멈춤 상태로 전환
                             #self.elevator_rack.state = constant.STOP_STATE
-                            # 사람이 타고 내리는 시간 sleep
+
+
                             self.elevator_rack.state = constant.LOAD_STATE
                             self.destination_floor = self.elevator_rack.ready_calls[0].destination
+
+                            # 사람이 타고 내리는 시간 sleep
+                            self.elevator_rack.ready_calls[0].flag = 1
+                            # 웨이팅 시간 계산
+                            st = str(self.elevator_rack.ready_calls[0].register_time)
+                            print(st)
+                            dateSplit = st.split('.')
+                            registertime = datetime.datetime.strptime(dateSplit[0], "%Y-%m-%d %H:%M:%S")
+
+
+                            regist_sec = registertime.hour*3600 + registertime.minute *60 +registertime.second
+                            getin_sec = self.dialog.timer[2]  + self.dialog.timer[1] *60 + self.dialog.timer[0] * 3600
+
+                            self.elevator_rack.ready_calls[0].setwaiting(regist_sec,getin_sec)
+                            #self.elevator_rack.ready_calls[0].waiting
+                            self.total_waiting += getin_sec - regist_sec
+                            self.ui.waiting(3, self.total_waiting)
+
                             time.sleep(2)
 
-                        if(int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].destination) ):
+                        elif int(self.elevator_rack.floor) == int(self.elevator_rack.ready_calls[0].destination) and self.elevator_rack.ready_calls[0].flag == 1:
                             print('ThreadEli2 :: arrived at calls destination floor ' )
                             print('ThreadEli2 :: people get in and out...')
                             print('elevator current floor info :equal: ', self.elevator_rack.floor)
