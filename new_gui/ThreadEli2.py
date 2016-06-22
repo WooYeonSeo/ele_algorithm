@@ -28,6 +28,8 @@ class ElavatorThread1(threading.Thread):
         self.destination_floor = 0
 
         self.total_waiting =0
+        self.now = 0
+        self.dbn_calls =[]
 
         #self.ui = getui.Getui()
 
@@ -206,18 +208,51 @@ class ElavatorThread1(threading.Thread):
                         # 10 분 을 그 시간에 더해주고 그 사이에 콜이 있는지 검사
                         time.sleep(5)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                         self.ui.showcall( 0,self.elevator_rack.ready_calls[0].departure ,self.elevator_rack.ready_calls[0].destination, 'IDLE')
-                        self.elevator_rack.ready_calls.pop(0)
+                        #self.elevator_rack.ready_calls.pop(0)
+                        self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
                         self.elevator_rack.state = constant.IDLE_STATE
 
+                        self.now = self.dialog.timer[2]
+                        self.now_min = self.dialog.timer[1]
+
+
             else:
-                self.elevator_rack.state = constant.IDLE_STATE
-                # 여기에서 시간이 십분이 넘으면 안되는거잖
-                # if - 더하기 10분 한 그 시간보다
-                # 그 시간이 지나면 - > 딥러닝 알고리즘을 빠지면
-                # print('no value ')
+                if(self.now == 0):
+                    print("now가 0일때")
+                    #self.now = time.localtime()
+                    self.now = self.dialog.timer[2]
+                    self.now_min = self.dialog.timer[1]
+                else:
+
+                    #if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
+                    if   self.dialog.timer[1] == self.now_min and self.dialog.timer[2]  >= self.now+20 :
+                        print("20초가 지났을 때")
+                        #print self.dbn_calls[-1]매개변수로 넣기
+                        if(len(self.dbn_calls)!=0):
+                            self.destination_floor = 3
+
+                        if(int(self.elevator_rack.floor) == int(self.destination_floor)):
+                            self.elevator_rack.state = constant.IDLE_STATE
+                            self.now = 0
+
+                        elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
+                            time.sleep(1.33)
+                            self.ui.up(1)
+                            self.elevator_rack.floor += 1
+                            print('elevator current floor info :lower: ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
+                            self.elevator_rack.state = constant.DEEP_STATE
 
 
-
+                        elif(int(self.elevator_rack.floor) > int(self.destination_floor)):
+                            time.sleep(1.33)
+                            self.ui.down(1)
+                            self.elevator_rack.floor -= 1
+                            print('elevator current floor info :higher: ', self.elevator_rack.floor)
+                            self.elevator_rack.state = constant.DEEP_STATE
+                        """
+                        for i in range(0,len(self.dbn_calls)):
+                            self.dbn_calls.pop(i)
+                        """
 
 
 
@@ -611,6 +646,7 @@ class ElavatorThread3(threading.Thread):
 
             else:
                 self.elevator_rack.state = constant.IDLE_STATE
+
                 # 여기에서 시간이 십분이 넘으면 안되는거잖
                 # if - 더하기 10분 한 그 시간보다
                 # 그 시간이 지나면 - > 딥러닝 알고리즘을 빠지면

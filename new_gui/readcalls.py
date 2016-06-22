@@ -4,6 +4,7 @@ import simulator
 import dataParsing as gdata
 import constant
 import math
+import random
 
 import call as c
 
@@ -139,7 +140,8 @@ class Readcalls(threading.Thread):
             else:
                 if (floor_term < self.current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
                     self.current_floor_term = floor_term  # 층 차이를 업데이트한다
-                    close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
+                    close_ele = random.randrange(0,4)  # 할당하는 엘레베이터 번호를 바꾼다.
+
 
         return close_ele
 
