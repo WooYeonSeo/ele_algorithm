@@ -13,7 +13,7 @@ import datetime
 
 #Open csv file and read in data
 #csvFile = "filename.csv"
-csvFile = "bulding-seoul-mytest.csv"
+csvFile = "data-table.csv"
 my_data = genfromtxt(csvFile, delimiter=';', skip_header=1)
 #skip_header : int, optional-The number of lines to skip at the beginning of the file.
 # my_data.shape[0] = 99(행수)
@@ -28,7 +28,7 @@ print tupleNum #99
 
 
 
-with open('bulding-seoul-mytest.csv', 'rb') as csvfile:
+with open('data-table.csv', 'rb') as csvfile:
 
     #속성 배열
     attrArr = []
@@ -53,7 +53,7 @@ with open('bulding-seoul-mytest.csv', 'rb') as csvfile:
     #registertime_5min
 
 
-    attrRow = csvfile.readline().replace('"','').split(';')
+    attrRow = csvfile.readline().replace('"','').split(',')
     #attrRow = csvfile.readline().replace('"','').split(',')
     for attr in attrRow:
         print attr
@@ -75,7 +75,7 @@ with open('bulding-seoul-mytest.csv', 'rb') as csvfile:
 
     #tuple길이 배열
     for i in range(0,tupleNum):
-        nowRow = csvfile.readline().replace('"','').split(';')
+        nowRow = csvfile.readline().replace('"','').split(',')
         #nowRow = csvfile.readline().replace('"','').split(',')
 
         #속성크기만큼 for

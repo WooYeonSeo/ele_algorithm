@@ -53,9 +53,9 @@ class Elevsim(object):
             self.max_duration = 0
 
     # 이건 시뮬에서 불러진다. - 엘베심에서 init다음으로 제일 먼저 실행됨
-    def run(self,data):
+    def run(self,data, ui):
         #self.ui.toggle()
-
+        self.ui = ui
         # 1. 엘레베이터 먼저 생성하겠음
         for index in range(0, constant.MAX_ELEVATORS):
             # print(self.elevator_rack[index])
@@ -68,21 +68,28 @@ class Elevsim(object):
         # 2. 처음에 가지고 온 시간을 콜 할당. 입력한 시간에 해당하는 투플 숫자를 가지고 온다
         self.tn = data #data.generateData(self.ui)
         registertime = gdata.getData(self.tn)
-        departure_floor = gdata.dataSet[self.tn][1]
-        destination_floor = gdata.dataSet[self.tn][2]
-        iserroroccured = gdata.dataSet[self.tn][13]
-        is_up = gdata.dataSet[self.tn][14]
+        # 해당 투플 (= 콜) 생성시 들어가는 데이터를 읽어온다 - 보기 좋으라고 이렇게 해놈
+        departure_floor = gdata.dataSet[self.tn][2]
+        destination_floor = gdata.dataSet[self.tn][3]
+        # iserroroccured = gdata.dataSet[tn][13]
+        is_up = gdata.dataSet[self.tn][4]
         passenger = 3  # 일단은 세명이라고 했음
-        # 읽은 값의 첫 위치 콜 생성한다
 
         # 데이터 추가
-        dbn_register_time = gdata.dataSet[self.tn][15] # 수정
-        day_of_week = gdata.dataSet[self.tn][12]
-        iserror = gdata.dataSet[self.tn][13]
-        weekend = gdata.dataSet[self.tn][10] # 수정
-        register15min = gdata.dataSet[self.tn][16]
+        dbn_register_time = gdata.dataSet[self.tn][1] # 수정
+        day_of_week = gdata.dataSet[self.tn][5]
+        iserror = gdata.dataSet[self.tn][6]
+        weekend = gdata.dataSet[self.tn][7] # 수정
+        register15min = gdata.dataSet[self.tn][8]
 
-        first_call = c.Call(registertime, departure_floor, destination_floor, is_up, passenger, dbn_register_time,day_of_week,iserror,weekend, register15min)
+        # call생성
+        # registertime,departurefloor,destinationfloor,el_idatfield,waitingtime,ridingtime,servicetime,6
+        # registertime_year,registertime_quarter,registertime_month,registertime_day,registertime_hour,registertime_dayofweek, 12
+        # iserroroccured,isup,registertime_30min,registertime_15min,registertime_5min 17
+
+        # register_time, departure_floor,destination_floor, isup, passenger, dbn_register_time, day_of_week, iserror, weekend, register15min):
+        first_call = c.Call(registertime, departure_floor, destination_floor, is_up, passenger, dbn_register_time,day_of_week,iserror,weekend, register15min)  # 1이 up, 0이 down
+
         # 나중에 웨이팅 구할때 사용 배열에 담는다
         self.elevator_calls.append(first_call)
         # 어느 엘리베이터에 할당할지를 고른다
@@ -99,7 +106,7 @@ class Elevsim(object):
         self.runThread()
 
         readcall = readcalls.Readcalls()
-        #readcall.setUI(self.ui)
+        readcall.setUI(self.ui)
         readcall.setDialog(self.dialog)
         readcall.settn(self.tn)
         readcall.setcalllist(self.elevator_calls)
@@ -114,25 +121,25 @@ class Elevsim(object):
     def runThread(self):
 
         t1 = ThreadEli2.ElavatorThread2()
-        #t1.setUI(self.ui)
+        t1.setUI(self.ui)
         t1.setDasom(self.tn)
         t1.setDialog(self.dialog)
         t1.setElevator_rack(self.elevator_rack[0])
 
         t2 = ThreadEli2.ElavatorThread1()
-        #t2.setUI(self.ui)
+        t2.setUI(self.ui)
         t2.setDasom(self.tn)
         t2.setDialog(self.dialog)
         t2.setElevator_rack(self.elevator_rack[1])
 
         t3 = ThreadEli2.ElavatorThread3()
-        #t3.setUI(self.ui)
+        t3.setUI(self.ui)
         t3.setDasom(self.tn)
         t3.setDialog(self.dialog)
         t3.setElevator_rack(self.elevator_rack[2])
 
         t4 = ThreadEli2.ElavatorThread4()
-        #t4.setUI(self.ui)
+        t4.setUI(self.ui)
         t4.setDasom(self.tn)
         t4.setDialog(self.dialog)
         t4.setElevator_rack(self.elevator_rack[3])
@@ -155,19 +162,18 @@ class Elevsim(object):
         # tn = 투플넘버를가지고 옵시다 - dataparsing에 접근
         registertime = gdata.getData(tn)
         # 해당 투플 (= 콜) 생성시 들어가는 데이터를 읽어온다 - 보기 좋으라고 이렇게 해놈
-        departure_floor = gdata.dataSet[tn][1]
-        destination_floor = gdata.dataSet[tn][2]
-        iserroroccured = gdata.dataSet[tn][13]
-        is_up = gdata.dataSet[tn][14]
+        departure_floor = gdata.dataSet[tn][2]
+        destination_floor = gdata.dataSet[tn][3]
+        # iserroroccured = gdata.dataSet[tn][13]
+        is_up = gdata.dataSet[tn][4]
         passenger = 3  # 일단은 세명이라고 했음
-        # call생성
 
         # 데이터 추가
-        dbn_register_time = gdata.dataSet[tn][15] # 수정
-        day_of_week = gdata.dataSet[tn][12]
-        iserror = gdata.dataSet[tn][13]
-        weekend = gdata.dataSet[tn][19] # 수정
-        register15min = gdata.dataSet[tn][16]
+        dbn_register_time = gdata.dataSet[tn][1] # 수정
+        day_of_week = gdata.dataSet[tn][5]
+        iserror = gdata.dataSet[tn][6]
+        weekend = gdata.dataSet[tn][7] # 수정
+        register15min = gdata.dataSet[tn][8]
 
         # call생성
         # registertime,departurefloor,destinationfloor,el_idatfield,waitingtime,ridingtime,servicetime,6
@@ -175,7 +181,7 @@ class Elevsim(object):
         # iserroroccured,isup,registertime_30min,registertime_15min,registertime_5min 17
 
         # register_time, departure_floor,destination_floor, isup, passenger, dbn_register_time, day_of_week, iserror, weekend, register15min):
-        new_call = c.Call(registertime, departure_floor, destination_floor, is_up, passenger, dbn_register_time,day_of_week,iserror,weekend, register15min)
+        new_call = c.Call(registertime, departure_floor, destination_floor, is_up, passenger, dbn_register_time,day_of_week,iserror,weekend, register15min)  # 1이 up, 0이 down
         #new_call = c.Call(registertime, departure_floor, destination_floor, is_up, passenger)  # 1이 up, 0이 down
         self.elevator_calls.append(new_call)
         print('departure_floor : ',new_call.departure, 'isup? :' ,new_call.isup)

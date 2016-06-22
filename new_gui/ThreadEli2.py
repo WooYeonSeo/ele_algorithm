@@ -26,7 +26,7 @@ class ElavatorThread1(threading.Thread):
         self.call_number = 0
         self.destination_floor = 0
 
-        self.ui = getui.Getui()
+        #self.ui = getui.Getui()
 
 
 
@@ -37,8 +37,8 @@ class ElavatorThread1(threading.Thread):
         return self.dasom
 
 
-    #def setUI(self, uiUI):
-    #    self.ui =uiUI
+    def setUI(self, uiUI):
+        self.ui =uiUI
 
     def getUI(self):
         return self.ui
@@ -74,7 +74,10 @@ class ElavatorThread1(threading.Thread):
                             time.sleep(1.33)
                             print('arrived to destination floor..')
                             self.elevator_rack.state = constant.LOAD_STATE
-                            self.elevator_rack.direction = self.elevator_rack.ready_calls[0].isup+1 # 1이 up 2 가 down
+                            if( self.elevator_rack.ready_calls[0].isup == 't'):
+                                self.elevator_rack.direction = constant.UP_DIRECTION # 1이 up 2 가 down
+                            else:
+                                self.elevator_rack.direction = constant.DOWN_DIRECTION
 
                             # 목적층을 도착층으로 바꾼다.
                             self.destination_floor = self.elevator_rack.ready_calls[0].destination
@@ -150,7 +153,7 @@ class ElavatorThread1(threading.Thread):
                         elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
 
                             time.sleep(1.33)
-                            self.ui.goup(1)
+                            self.ui.up(1)
                             self.elevator_rack.floor += 1
 
                             print('elevator current floor info :lower: ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
@@ -166,7 +169,7 @@ class ElavatorThread1(threading.Thread):
 
                         elif(int(self.elevator_rack.floor) > int(self.destination_floor)):
                             time.sleep(1.33)
-                            self.ui.godown(1)
+                            self.ui.down(1)
                             self.elevator_rack.floor -= 1
                             print('elevator current floor info :higher: ', self.elevator_rack.floor)
                             self.elevator_rack.state = constant.LOAD_STATE
@@ -208,7 +211,7 @@ class ElavatorThread2(threading.Thread):
         self.dests = []
         self.departure_floors = []
         self.destination_floors = []
-        self.ui = getui.Getui()
+        #self.ui = getui.Getui()
 
         self.destination_floor = 0
 
@@ -253,7 +256,11 @@ class ElavatorThread2(threading.Thread):
                             time.sleep(1.33)
                             print('arrived to destination floor..')
                             self.elevator_rack.state = constant.LOAD_STATE
-                            self.elevator_rack.direction = self.elevator_rack.ready_calls[0].isup+1 # 1이 up 2 가 down
+
+                            if( self.elevator_rack.ready_calls[0].isup == 't'):
+                                self.elevator_rack.direction = constant.UP_DIRECTION # 1이 up 2 가 down
+                            else:
+                                self.elevator_rack.direction = constant.DOWN_DIRECTION
 
                             # 목적층을 도착층으로 바꾼다.
                             self.destination_floor = self.elevator_rack.ready_calls[0].destination
@@ -331,7 +338,7 @@ class ElavatorThread2(threading.Thread):
                             time.sleep(1.33)
 
                             # getui.Getui.goup(2)
-                            self.ui.goup(2)
+                            self.ui.up(2)
                             self.elevator_rack.floor += 1
 
                             print('elevator current floor info :lower: ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
@@ -347,7 +354,7 @@ class ElavatorThread2(threading.Thread):
 
                         elif(int(self.elevator_rack.floor) > int(self.destination_floor)):
                             time.sleep(1.33)
-                            self.ui.godown(2)
+                            self.ui.down(2)
                             self.elevator_rack.floor -= 1
                             print('elevator current floor info :higher: ', self.elevator_rack.floor)
                             self.elevator_rack.state = constant.LOAD_STATE
@@ -384,7 +391,7 @@ class ElavatorThread3(threading.Thread):
         self.dests = []
         self.departure_floors = []
         self.destination_floors = []
-        self.ui =getui.Getui()
+        #self.ui =getui.Getui()
         self.destination_floor = 0
 
     def setDasom(self, uidasom):
@@ -394,7 +401,7 @@ class ElavatorThread3(threading.Thread):
         return self.dasom
 
     def setUI(self, uiUI):
-        self.ui = getui.Getui()
+        self.ui =uiUI
 
     def getUI(self):
         return self.ui
@@ -428,7 +435,10 @@ class ElavatorThread3(threading.Thread):
                             time.sleep(1.33)
                             print('arrived to destination floor..')
                             self.elevator_rack.state = constant.LOAD_STATE
-                            self.elevator_rack.direction = self.elevator_rack.ready_calls[0].isup+1 # 1이 up 2 가 down
+                            if( self.elevator_rack.ready_calls[0].isup == 't'):
+                                self.elevator_rack.direction = constant.UP_DIRECTION # 1이 up 2 가 down
+                            else:
+                                self.elevator_rack.direction = constant.DOWN_DIRECTION
 
                             # 목적층을 도착층으로 바꾼다.
                             self.destination_floor = self.elevator_rack.ready_calls[0].destination
@@ -559,7 +569,7 @@ class ElavatorThread4(threading.Thread):
         self.destination_floors = []
         self.call_number = 0
         self.destination_floor = 0
-        self.ui = getui.Getui()
+        #self.ui = getui.Getui()
 
     def setDasom(self, uidasom):
         self.dasom =uidasom
@@ -568,7 +578,7 @@ class ElavatorThread4(threading.Thread):
         return self.dasom
 
     def setUI(self, uiUI):
-        self.ui =getui.Getui()
+        self.ui =uiUI
 
     def getUI(self):
         return self.ui
@@ -602,7 +612,11 @@ class ElavatorThread4(threading.Thread):
                             time.sleep(1.33)
                             print('arrived to destination floor..')
                             self.elevator_rack.state = constant.LOAD_STATE
-                            self.elevator_rack.direction = self.elevator_rack.ready_calls[0].isup+1 # 1이 up 2 가 down
+
+                            if( self.elevator_rack.ready_calls[0].isup == 't'):
+                                self.elevator_rack.direction = constant.UP_DIRECTION # 1이 up 2 가 down
+                            else:
+                                self.elevator_rack.direction = constant.DOWN_DIRECTION
 
                             # 목적층을 도착층으로 바꾼다.
                             self.destination_floor = self.elevator_rack.ready_calls[0].destination

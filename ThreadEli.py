@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""
 import threading
 import dataParsing as data
 import elevatorMove as move
@@ -348,3 +349,4 @@ class ElavatorThread4(threading.Thread):
 
     def run(self):
         print('thread 4 ')
+"""

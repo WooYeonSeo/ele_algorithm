@@ -20,4 +20,3 @@ class Getui(object):
     def godown(self,index):
         self.ui.down(index)
 
-

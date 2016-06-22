@@ -40,10 +40,10 @@ class Ui_MainWindow(object):
         #self.thread = GUIThread()
         #self.thread.start()
 
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow, get):
+        self.ui = get
 
-
-
+        #self.ui = get
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(1282, 710)
         self.centralwidget = QtGui.QWidget(MainWindow)
@@ -505,7 +505,7 @@ class Ui_MainWindow(object):
         watch = stopwatch.StopWatch(self.dialog)
         watch.start()
 
-        self.elev.run(data)
+        self.elev.run(data, self.ui)
 
 
 

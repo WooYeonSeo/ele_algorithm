@@ -28,7 +28,7 @@ print tupleNum #99
 
 
 
-with open('bulding-seoul-mytest-desc.csv', 'rb') as csvfile:
+with open('data-table.csv', 'rb') as csvfile:
 
     #속성 배열
     attrArr = []

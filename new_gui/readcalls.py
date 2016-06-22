@@ -71,26 +71,30 @@ class Readcalls(threading.Thread):
         # tn = 투플넘버를가지고 옵시다 - dataparsing에 접근
         registertime = gdata.getData(tn)
         # 해당 투플 (= 콜) 생성시 들어가는 데이터를 읽어온다 - 보기 좋으라고 이렇게 해놈
-        departure_floor = gdata.dataSet[tn][1]
-        destination_floor = gdata.dataSet[tn][2]
+        # 해당 투플 (= 콜) 생성시 들어가는 데이터를 읽어온다 - 보기 좋으라고 이렇게 해놈
+
+        # registertime,dbn_registertime,departurefloor,destinationfloor,isup,registertime_dayofweek,iserroroccured,weekend,registertime_15min
+        departure_floor = gdata.dataSet[tn][2]
+        destination_floor = gdata.dataSet[tn][3]
         # iserroroccured = gdata.dataSet[tn][13]
-        is_up = gdata.dataSet[tn][14]
+        is_up = gdata.dataSet[tn][4]
         passenger = 3  # 일단은 세명이라고 했음
 
         # 데이터 추가
-        dbn_register_time = gdata.dataSet[tn][15] # 수정
-        day_of_week = gdata.dataSet[tn][12]
-        iserror = gdata.dataSet[tn][13]
-        weekend = gdata.dataSet[tn][19] # 수정
-        register15min = gdata.dataSet[tn][16]
+        dbn_register_time = gdata.dataSet[tn][1] # 수정
+        day_of_week = gdata.dataSet[tn][5]
+        iserror = gdata.dataSet[tn][6]
+        weekend = gdata.dataSet[tn][7] # 수정
+        register15min = gdata.dataSet[tn][8]
 
         # call생성
-        # registertime,departurefloor,destinationfloor,el_idatfield,waitingtime,ridingtime,servicetime,6
-        # registertime_year,registertime_quarter,registertime_month,registertime_day,registertime_hour,registertime_dayofweek, 12
-        # iserroroccured,isup,registertime_30min,registertime_15min,registertime_5min 17
+        # self, register_time, departure_floor,destination_floor, isup, passenger, dbn_register_time, day_of_week, iserror, weekend, register15min)
 
         # register_time, departure_floor,destination_floor, isup, passenger, dbn_register_time, day_of_week, iserror, weekend, register15min):
         new_call = c.Call(registertime, departure_floor, destination_floor, is_up, passenger, dbn_register_time,day_of_week,iserror,weekend, register15min)  # 1이 up, 0이 down
+
+        # register_time, departure_floor,destination_floor, isup, passenger, dbn_register_time, day_of_week, iserror, weekend, register15min):
+        #new_call = c.Call(registertime, departure_floor, destination_floor, is_up, passenger, dbn_register_time,day_of_week,iserror,weekend, register15min)  # 1이 up, 0이 down
         self.elevator_calls.append(new_call)
         print('departure_floor : ',new_call.departure, ' --> ' ,new_call.destination)
         self.elevator_calls.append(new_call)  # 나중에 waitingtime 계산할때 쓸라고 배열에 담아놓는다.

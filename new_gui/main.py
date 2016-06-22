@@ -33,11 +33,11 @@ if __name__ == "__main__":
 
 
     ui = simulator.Ui_MainWindow(dia)
-
-    ui.setupUi(MainWindow)
+    #get = getui.Getui()
+    #get.setui(ui)
+    ui.setupUi(MainWindow, ui)
     MainWindow.show()
-    get = getui.Getui()
-    get.setui(ui)
+
 
 
 
