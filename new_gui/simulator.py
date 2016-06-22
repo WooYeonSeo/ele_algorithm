@@ -512,21 +512,21 @@ class Ui_MainWindow(object):
 
     def up(self, eleNum):
         if eleNum == 1:
-            self.car1.move(self.car1.x(),self.car1.y()-self.car1.height()+0.3)
+            self.car1.move(self.car1.x(),self.car1.y()-self.car1.height()+1)
         if eleNum == 2:
-            self.car2.move(self.car2.x(),self.car2.y()-self.car2.height()+0.5)
+            self.car2.move(self.car2.x(),self.car2.y()-self.car2.height()+1)
         if eleNum == 3:
-            self.car3.move(self.car3.x(),self.car3.y()-self.car3.height()+0.7)
+            self.car3.move(self.car3.x(),self.car3.y()-self.car3.height()+1)
         if eleNum == 4:
             self.car4.move(self.car4.x(),self.car4.y()-self.car4.height()+1)
 
     def down(self,eleNum):
         if eleNum == 1:
-            self.car1.move(self.car1.x(),self.car1.y()+self.car1.height()-0.3)
+            self.car1.move(self.car1.x(),self.car1.y()+self.car1.height()-1)
         if eleNum == 2:
-            self.car2.move(self.car2.x(),self.car2.y()+self.car2.height()-0.5)
+            self.car2.move(self.car2.x(),self.car2.y()+self.car2.height()-1)
         if eleNum == 3:
-            self.car3.move(self.car3.x(),self.car3.y()+self.car3.height()-0.7)
+            self.car3.move(self.car3.x(),self.car3.y()+self.car3.height()-1)
         if eleNum == 4:
             self.car4.move(self.car4.x(),self.car4.y()+self.car4.height()-1)
 
@@ -543,6 +543,25 @@ class Ui_MainWindow(object):
         if(index == 3):
             self.ele4_waitingtime = sec
             self.car4WaitingTime.setText( str(self.ele4_waitingtime))
+
+    def showcall(self, index , depart, destin, state):
+        if(index == 0):
+            self.car1StartFloor.setText(depart)
+            self.car1Destination.setText(destin)
+            self.label.setText(state)
+        if(index == 1):
+            self.car2StartFloor.setText(depart)
+            self.car2Destination.setText(destin)
+            self.label_2.setText(state)
+        if(index == 2):
+            self.car2StartFloor_2.setText(depart)
+            self.car3Destination.setText(destin)
+            self.label_3.setText(state)
+        if(index == 3):
+            self.car4StartFloor.setText(depart)
+            self.car4Destination.setText(destin)
+            self.label_4.setText(state)
+
 
     def toggle(self):
 

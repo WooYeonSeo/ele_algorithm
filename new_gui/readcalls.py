@@ -112,15 +112,14 @@ class Readcalls(threading.Thread):
         # for i in range(0,4):
         for index in range(0, 4):#constant.MAX_ELEVATORS
         #while(index < 4):
-
-            if (int(self.elevator_rack[index].floor) == call.departure):
+            # 같은층인데 idle
+            if (int(self.elevator_rack[index].floor) == call.departure and self.elevator_rack[index].state == constant.IDLE_STATE):
 
                 close_ele = index
-                # self.elevator_rack[index].state = constant.LOAD_STATE  # 이거 다시 해야됨 아무튼 태운다는 뜻입니다
-            # 엘베 위치가 나의 출발층보다 아래이고  call이 위로 올라가는 콜이면 할당리스트에 넣겠다.
+            # 같은층은 아닌데 idle
             elif(self.elevator_rack[index].state == constant.IDLE_STATE):
                 close_ele = index
-            elif (int(self.elevator_rack[index].floor) < call.departure and (call.isup) == 1 ):  # 1이 up, 0이 down
+            elif (int(self.elevator_rack[index].floor) < call.destination and (call.isup) == 1 ):  # 1이 up, 0이 down
                 # 층 차이
                 floor_term = abs(int(call.departure) - int(self.elevator_rack[index].floor))
 
@@ -129,11 +128,15 @@ class Readcalls(threading.Thread):
                     self.current_floor_term = floor_term  # 층 차이를 업데이트한다
                     close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
             # 내 콜이 내려가는콜이고 , 내위치보다 엘레베이터가 위에 있을 때
-            elif (call.departure < int(self.elevator_rack[index].floor) and (call.isup) == 0):
+            elif (call.destination < int(self.elevator_rack[index].floor) and (call.isup) == 0):
                 # 층차이
 
                 floor_term = abs(int(self.elevator_rack[index].floor) - int(call.departure))
 
+                if (floor_term < self.current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
+                    self.current_floor_term = floor_term  # 층 차이를 업데이트한다
+                    close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
+            else:
                 if (floor_term < self.current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
                     self.current_floor_term = floor_term  # 층 차이를 업데이트한다
                     close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
