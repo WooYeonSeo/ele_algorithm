@@ -1,5 +1,5 @@
 registertime,dbn_registertime,departurefloor,destinationfloor,isup,registertime_dayofweek,iserroroccured,weekend,registertime_15min
-2015-11-16 16:45:59.1,60479,10,7,0,1,0,0,45
+2015-11-16 16:46:59.1,60479,10,7,0,1,0,0,45
 2015-11-16 16:48:09.1,60489,8,3,0,1,0,0,45
 2015-11-16 16:48:11.6,60491,3,14,1,1,0,0,45
 2015-11-16 16:48:12.6,60492,3,10,1,1,0,0,45
