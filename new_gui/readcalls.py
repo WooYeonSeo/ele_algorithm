@@ -76,48 +76,38 @@ class Readcalls(threading.Thread):
                                 print('EL1 콜이 있는데 정지플래그 : 쓰레드 실행시킨다, 실행으로 플래그 변경')
                                 self.t1._stop.set()
                                 self.threadFlag[i] = 0
-                            else:
-                                print('EL1 :call O run flag: call X콜도 없고 정지플래그')
+
                         elif (i == 1):
                             print("EL2 flag : ", self.threadFlag[i], "readycall length",len(self.elevator_rack[i].ready_calls))
-                            if (len(self.elevator_rack[i].ready_calls) == 0 and self.threadFlag[i] == 0):
+                            if (len(self.elevator_rack[i].ready_calls) == 0 ):
                                 print('EL2 콜이 없고 실행플래그 : 정지시킨다, 정지로 플래그 변경')
                                 self.t2._stop.clear()
-                                self.threadFlag[i] = 1
-                            elif (len(self.elevator_rack[i].ready_calls) != 0 and self.threadFlag[i] == 1):
+                                #self.threadFlag[i] = 1
+                            elif (len(self.elevator_rack[i].ready_calls) != 0 ):
                                 print('EL2 콜이 있는데 정지플래그 : 쓰레드 실행시킨다, 실행으로 플래그 변경')
                                 self.t2._stop.set()
-                                self.threadFlag[i] = 0
-                            else:
-                                print('EL2 :call O run flag: call X콜도 없고 정지플래그')
+                                #self.threadFlag[i] = 0
+
                         elif (i == 2):
                             print("EL3 flag : ", self.threadFlag[i], "readycall length",len(self.elevator_rack[i].ready_calls))
-                            if (len(self.elevator_rack[i].ready_calls) == 0 and self.threadFlag[i] == 0):
+                            if (len(self.elevator_rack[i].ready_calls) == 0 ):
                                 print('EL3 콜이 없고 실행플래그 : 정지시킨다, 정지로 플래그 변경')
                                 self.t3._stop.clear()
-                                self.threadFlag[i] = 1
-                            elif (len(self.elevator_rack[i].ready_calls) != 0 and self.threadFlag[i] == 1):
+                                #self.threadFlag[i] = 1
+                            elif (len(self.elevator_rack[i].ready_calls) != 0 ):
                                 print('EL3 콜이 있는데 정지플래그 : 쓰레드 실행시킨다, 실행으로 플래그 변경')
                                 self.t3._stop.set()
-                                self.threadFlag[i] = 0
-                            elif (len(self.elevator_rack[i].ready_calls) != 0 and self.threadFlag[i] == 1):
-                                print('EL4 콜이 있는데 실행플래그 : 쓰레드 실행시킨다, 실행으로 플래그 변경')
-                                self.t4._stop.set()
-                                self.threadFlag[i] = 0
-                            else:
-                                print('EL3 :call O run flag: call X콜도 없고 정지플래그')
-                                self.t3._stop.clear()
-
+                                #self.threadFlag[i] = 0
                         elif (i == 3):
                             print("EL4 flag : ", self.threadFlag[i], "readycall length",len(self.elevator_rack[i].ready_calls))
                             if (len(self.elevator_rack[i].ready_calls) == 0 ):
                                 print('EL4 콜이 없고 ')
                                 self.t4._stop.clear()
-                                self.threadFlag[i] = 1
+                                #self.threadFlag[i] = 1
                             elif (len(self.elevator_rack[i].ready_calls) != 0 ):
                                 print('EL4 콜이 있는데 ')
                                 self.t4._stop.set()
-                                self.threadFlag[i] = 0
+                                #self.threadFlag[i] = 0
 
 
 
