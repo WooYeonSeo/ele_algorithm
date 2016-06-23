@@ -5,6 +5,7 @@ import simulator
 import time
 import constant
 import datetime
+import dbn
 
 def asc_destlist(list):
     return list.departure
@@ -34,8 +35,14 @@ class ElavatorThread1(threading.Thread):
         self.total_waiting =0
         self.now = 0
         self.dbn_calls =[]
+        self.__suspend = False
 
         #self.ui = getui.Getui()
+    def mySuspend(self):
+        self.__suspend = True
+
+    def myResume(self):
+        self.__suspend = False
 
 
 
@@ -57,28 +64,22 @@ class ElavatorThread1(threading.Thread):
     def setElevator_rack(self, elevator_rack):
         self.elevator_rack = elevator_rack
 
-    def stop(self):
-        self._stop.set()
-
-    def stopped(self):
-        return self._stop.isSet()
-
 
     def run(self):
 
         print("thread 1 ")
+
         # print('thread 2 ')
         # 콜이 있는지 없는지 확인하는 것
         while (1):
 
+            while self.__suspend:
+                time.sleep(10000)
+                print('suspended called')
+
             #if(self.elevator_rack.ready_calls[0] != None or len(self.dests) != 0):
             if(len(self.elevator_rack.ready_calls) != 0 ):
-                # print(self.elevator_rack.ready_calls[0].departure)
-                #  엘레베이터의 스테이트를 계속 확인하는 while문
-                # while(1):
-                    # 1. idle 일 때 - 첫번째 콜을 받아서 목적층 콜리스트에 넣고 운행상태로 바꾼다
-                    # if( len(self.elevator_rack.ready_calls) == 1):
-                    #    print('one value : ', len(self.elevator_rack.ready_calls))
+                    self.now =0
 
                     if(self.elevator_rack.state == constant.IDLE_STATE):
                         print('____IDLE STATE1___', self.elevator_rack.ready_calls[0].departure ,'->', self.elevator_rack.ready_calls[0].destination )
@@ -242,10 +243,16 @@ class ElavatorThread1(threading.Thread):
                         #print self.dbn_calls[-1]매개변수로 넣기
                         if(len(self.dbn_calls)!=0):
                             self.destination_floor = 3
+                            # self.dbn_calls.pop(0)
+                            for i in range(0,len(self.dbn_calls)):
+                                self.dbn_calls.pop(i)
 
                         if(int(self.elevator_rack.floor) == int(self.destination_floor)):
                             self.elevator_rack.state = constant.IDLE_STATE
                             self.now = 0
+                            # 여기서 쓰레드 stop
+                            self.__suspend = True
+                            print('suspended : 정지됨')
 
                         elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
                             time.sleep(1.33)
@@ -476,6 +483,8 @@ class ElavatorThread2(threading.Thread):
                         #print self.dbn_calls[-1]매개변수로 넣기
                         if(len(self.dbn_calls)!=0):
                             self.destination_floor = 3
+                            for i in range(0,len(self.dbn_calls)):
+                                self.dbn_calls.pop(i)
 
                         if(int(self.elevator_rack.floor) == int(self.destination_floor)):
                             self.elevator_rack.state = constant.IDLE_STATE
@@ -713,7 +722,9 @@ class ElavatorThread3(threading.Thread):
                         print("20초가 지났을 때")
                         #print self.dbn_calls[-1]매개변수로 넣기
                         if(len(self.dbn_calls)!=0):
-                            self.destination_floor = 3
+                            self.destination_floor = 3#dbn.predict(self.dbn_calls.pop(-1))
+                            for i in range(0,len(self.dbn_calls)):
+                                self.dbn_calls.pop(i)
 
                         if(int(self.elevator_rack.floor) == int(self.destination_floor)):
                             self.elevator_rack.state = constant.IDLE_STATE
@@ -956,6 +967,8 @@ class ElavatorThread4(threading.Thread):
                         #self.destination_floor = 3
                         if(len(self.dbn_calls)!=0):
                             self.destination_floor = 3
+                            for i in range(0,len(self.dbn_calls)):
+                                self.dbn_calls.pop(i)
 
                         if(int(self.elevator_rack.floor) == int(self.destination_floor)):
                             self.elevator_rack.state = constant.IDLE_STATE

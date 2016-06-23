@@ -103,22 +103,8 @@ class Elevsim(object):
         # 가정 : 시간순으로 데이터가 정렬되어있다, 시간이 지나기 전에검색 할 수 있다.
         # 해당 투플 다음 한줄씩 읽는다
         # 스레드 실행
-        self.runThread()
-
-        readcall = readcalls.Readcalls()
-        readcall.setUI(self.ui)
-        readcall.setDialog(self.dialog)
-        readcall.settn(self.tn)
-        readcall.setcalllist(self.elevator_calls)
-        readcall.setElevator_rack(self.elevator_rack)
-        readcall.start()
 
 
-
-
-
-
-    def runThread(self):
 
         t1 = ThreadEli2.ElavatorThread1()
         t1.setUI(self.ui)
@@ -149,8 +135,23 @@ class Elevsim(object):
         t3.start()
         t4.start()
 
+        readcall = readcalls.Readcalls()
+        readcall.setUI(self.ui)
+        readcall.setDialog(self.dialog)
+        readcall.settn(self.tn)
+        readcall.setcalllist(self.elevator_calls)
+        readcall.setElevator_rack(self.elevator_rack,t1,t2,t3,t4)
+        readcall.start()
 
-        # eleIdCheck.ele(data)
+
+
+
+
+
+
+
+
+
 
         # #eleThread1 = ElavatorThread1()
         # eleThread1.start()
@@ -231,19 +232,7 @@ class Elevsim(object):
 
 
     def allocate(self, call):
-        # 엘레베이터들의 위치를 가진다
-        """
-            추가할 내용
-            :알고리즘짤때 우리는 레지스터
-            `같은 층에서 호출은 알아서 무시해줘야 됨
-             - 13초에 2층 (업)콜발생 - 1호기 할당
-             - 14초에 2층 (업)콜발생 - 해당 층에 할당이 되어있으면 할당하지 않는다.
-             - 15초에 2층 (다운)콜발생 - 이거는 할당한다
-        """
         close_ele = 0  # 가장 가까운 엘레베이터 번호
-          # 층 차이값일단 최대로 줌
-
-        # 각각의 엘리베이터들마다 상황을 비교한다
 
         for index in range(0, constant.MAX_ELEVATORS):
             if (self.elevator_rack[index].floor == call.departure):

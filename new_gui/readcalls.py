@@ -20,12 +20,19 @@ class Readcalls(threading.Thread):
         threading.Thread.__init__(self)
         self.call_number = 0
         self.current_floor_term = 20  # 층 차이값일단 최대로 줌
+        self.threadFlag = 0
+
+
 
     def settn(self, tn):
         self.tn =tn
 
-    def setElevator_rack(self, elevator_rack):
+    def setElevator_rack(self, elevator_rack, t1, t2,t3,t4):
         self.elevator_rack = elevator_rack
+        self.t1 = t1
+        self.t2 = t2
+        self.t3 = t3
+        self.t4 = t4
 
     def setUI(self, uiUI):
         self.ui =uiUI
@@ -54,10 +61,38 @@ class Readcalls(threading.Thread):
                     allocated_elevator = int(allocated_elevator)
 
                     print("getcall!!!  + allocated elevator num : " , allocated_elevator)
+
+                    # flag가 1로 스탑이라는데 할당된 엘리베이터가 0번 이면(새 콜이 들어왔다는 거) 다시 플래그를 운행중인 0 으로 바꾸어준다
+                    #if( self.threadFlag ==1 and allocated_elevator == 0 ): # 정지상태가 아닌
+                    #    self.threadFlag = 0
+
                     # 할당받은 엘리베이터의 배열에 넣겠다
                     self.elevator_rack[allocated_elevator].ready_calls.append(call)
                     self.tn += 1
+
+                    for i in range(0,4):
+                        #콜이 없는데 실행중이면 멈추고 스탑으로flag=1바꿈
+                        if(len(self.elevator_rack[0].ready_calls) == 0 and self.threadFlag == 0):
+                            print('콜이 없고 실행플래그 : 정지시킨다, 정지로 플래그 변경')
+                            self.t1.mySuspend()
+                            self.threadFlag = 1
+                        elif(len(self.elevator_rack[0].ready_calls) != 0 and self.threadFlag == 1):
+                            print('콜이 있는데 정지플래그 : 쓰레드 실행시킨다, 실행으로 플래그 변경')
+                            self.t1.myResume()
+                            self.threadFlag = 0
+                        elif(len(self.elevator_rack[0].ready_calls) != 0 and self.threadFlag == 0):
+                            print('콜도 있고 실행플래그 : ')
+                        elif(len(self.elevator_rack[0].ready_calls) == 0 and self.threadFlag != 0):
+                            print('콜도 없고 정지플래그 : ')
+                            #self.threadFlag = 0
+
+
+
+
+
+
                 time.sleep(0.4)
+
 
                 # 가지고 온 시간이 지난 시간의 것이면 pass
             # self.tn이 100번째가 넘어가면 나간다 와일문
