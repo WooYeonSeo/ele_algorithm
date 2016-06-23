@@ -216,8 +216,8 @@ class ElavatorThread1(threading.Thread):
                         # 10 분 을 그 시간에 더해주고 그 사이에 콜이 있는지 검사
                         time.sleep(5)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                         self.ui.showcall( 0,self.elevator_rack.ready_calls[0].departure ,self.elevator_rack.ready_calls[0].destination, 'IDLE')
-                        #self.elevator_rack.ready_calls.pop(0)
-                        self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
+                        self.elevator_rack.ready_calls.pop(0)
+                        #self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
                         self.elevator_rack.state = constant.IDLE_STATE
 
                         self.now = self.dialog.timer[2]
@@ -240,9 +240,9 @@ class ElavatorThread1(threading.Thread):
                         #print self.dbn_calls[-1]매개변수로 넣기
                         if(len(self.dbn_calls)!=0):
                             self.destination_floor = 3
-                            # self.dbn_calls.pop(0)
-                            for i in range(0,len(self.dbn_calls)):
-                                self.dbn_calls.pop(i)
+                            #self.dbn_calls.pop(0)
+                            #for i in range(0,len(self.dbn_calls)):
+                            #    self.dbn_calls.pop(i)
 
                         if(int(self.elevator_rack.floor) == int(self.destination_floor)):
                             self.elevator_rack.state = constant.IDLE_STATE
@@ -472,7 +472,8 @@ class ElavatorThread2(threading.Thread):
                         # 10 분 을 그 시간에 더해주고 그 사이에 콜이 있는지 검사
                         time.sleep(5)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                         self.ui.showcall( 1,self.elevator_rack.ready_calls[0].departure ,self.elevator_rack.ready_calls[0].destination, 'IDLE')
-                        self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
+                        #self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
+                        self.elevator_rack.ready_calls.pop(0)
                         self.elevator_rack.state = constant.IDLE_STATE
 
             else:
@@ -492,8 +493,8 @@ class ElavatorThread2(threading.Thread):
                         #print self.dbn_calls[-1]매개변수로 넣기
                         if(len(self.dbn_calls)!=0):
                             self.destination_floor = 3
-                            for i in range(0,len(self.dbn_calls)):
-                                self.dbn_calls.pop(i)
+                            #for i in range(0,len(self.dbn_calls)):
+                            #    self.dbn_calls.pop(i)
 
                         if(int(self.elevator_rack.floor) == int(self.destination_floor)):
                             self.elevator_rack.state = constant.IDLE_STATE
@@ -719,7 +720,8 @@ class ElavatorThread3(threading.Thread):
                         # 10 분 을 그 시간에 더해주고 그 사이에 콜이 있는지 검사
                         time.sleep(5)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                         self.ui.showcall( 2,self.elevator_rack.ready_calls[0].departure ,self.elevator_rack.ready_calls[0].destination, 'IDLE')
-                        self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
+                        #self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
+                        self.elevator_rack.ready_calls.pop(0)
                         self.elevator_rack.state = constant.IDLE_STATE
 
                         self.now = self.dialog.timer[2]
@@ -741,8 +743,8 @@ class ElavatorThread3(threading.Thread):
                         #print self.dbn_calls[-1]매개변수로 넣기
                         if(len(self.dbn_calls)!=0):
                             self.destination_floor = 3#dbn.predict(self.dbn_calls.pop(-1))
-                            for i in range(0,len(self.dbn_calls)):
-                                self.dbn_calls.pop(i)
+                            #for i in range(0,len(self.dbn_calls)):
+                            #    self.dbn_calls.pop(i)
 
                         if(int(self.elevator_rack.floor) == int(self.destination_floor)):
                             self.elevator_rack.state = constant.IDLE_STATE
@@ -970,8 +972,8 @@ class ElavatorThread4(threading.Thread):
                         # 10 분 을 그 시간에 더해주고 그 사이에 콜이 있는지 검사
                         time.sleep(5)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                         self.ui.showcall( 3,self.elevator_rack.ready_calls[0].departure ,self.elevator_rack.ready_calls[0].destination, 'IDLE')
-                        #self.elevator_rack.ready_calls.pop(0)
-                        self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
+                        self.elevator_rack.ready_calls.pop(0)
+                        #self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
                         self.elevator_rack.state = constant.IDLE_STATE
 
                         self.now = self.dialog.timer[2]
@@ -995,8 +997,8 @@ class ElavatorThread4(threading.Thread):
                         #self.destination_floor = 3
                         if(len(self.dbn_calls)!=0):
                             self.destination_floor = 3
-                            for i in range(0,len(self.dbn_calls)):
-                                self.dbn_calls.pop(i)
+                            #for i in range(0,len(self.dbn_calls)):
+                            #    self.dbn_calls.pop(i)
 
                         if(int(self.elevator_rack.floor) == int(self.destination_floor)):
                             self.elevator_rack.state = constant.IDLE_STATE
