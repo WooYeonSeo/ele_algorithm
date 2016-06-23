@@ -21,6 +21,10 @@ class ElavatorThread1(threading.Thread):
 
     def __init__(self, parent = None):
         threading.Thread.__init__(self)
+
+        super(ElavatorThread1, self).__init__()
+        self._stop = threading.Event()
+
         self.dests = []
         self.departure_floors = []
         self.destination_floors = []
@@ -52,6 +56,12 @@ class ElavatorThread1(threading.Thread):
         self.dialog = uiDialog
     def setElevator_rack(self, elevator_rack):
         self.elevator_rack = elevator_rack
+
+    def stop(self):
+        self._stop.set()
+
+    def stopped(self):
+        return self._stop.isSet()
 
 
     def run(self):
@@ -220,12 +230,14 @@ class ElavatorThread1(threading.Thread):
                 if(self.now == 0):
                     print("now가 0일때")
                     #self.now = time.localtime()
-                    self.now = self.dialog.timer[2]
-                    self.now_min = self.dialog.timer[1]
+                    #self.now = self.dialog.timer[2]
+                    #self.now_min = self.dialog.timer[1]
+                    time.sleep(1)
+
                 else:
 
                     #if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
-                    if   self.dialog.timer[1] == self.now_min and self.dialog.timer[2]  >= self.now+20 :
+                    if self.dialog.timer[1]*60 +self.dialog.timer[2] >= self.now_min*60 + self.now+20 :
                         print("20초가 지났을 때")
                         #print self.dbn_calls[-1]매개변수로 넣기
                         if(len(self.dbn_calls)!=0):
@@ -272,6 +284,10 @@ class ElavatorThread2(threading.Thread):
 
         self.destination_floor = 0
         self.total_waiting =0
+
+        self.dbn_calls = []
+        self.now =0
+        self.now_min =0
 
     def setDasom(self, uidasom):
         self.dasom =uidasom
@@ -406,8 +422,6 @@ class ElavatorThread2(threading.Thread):
 
 
 
-
-
                         elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
 
                             time.sleep(1.33)
@@ -442,15 +456,49 @@ class ElavatorThread2(threading.Thread):
                         # 10 분 을 그 시간에 더해주고 그 사이에 콜이 있는지 검사
                         time.sleep(5)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                         self.ui.showcall( 1,self.elevator_rack.ready_calls[0].departure ,self.elevator_rack.ready_calls[0].destination, 'IDLE')
-                        self.elevator_rack.ready_calls.pop(0)
+                        self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
                         self.elevator_rack.state = constant.IDLE_STATE
 
             else:
-                self.elevator_rack.state = constant.IDLE_STATE
-                # 여기에서 시간이 십분이 넘으면 안되는거잖
-                # if - 더하기 10분 한 그 시간보다
-                # 그 시간이 지나면 - > 딥러닝 알고리즘을 빠지면
-                # print('no value ')
+                #self.elevator_rack.state = constant.IDLE_STATE
+                if(self.now == 0):
+                    print("now가 0일때")
+
+                    #self.now = time.localtime()
+                    self.now = self.dialog.timer[2]
+                    self.now_min = self.dialog.timer[1]
+                    time.sleep(1)
+                else:
+
+                    #if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
+                    if self.dialog.timer[1]*60 +self.dialog.timer[2] >= self.now_min*60 + self.now+20 :
+                        print("20초가 지났을 때")
+                        #print self.dbn_calls[-1]매개변수로 넣기
+                        if(len(self.dbn_calls)!=0):
+                            self.destination_floor = 3
+
+                        if(int(self.elevator_rack.floor) == int(self.destination_floor)):
+                            self.elevator_rack.state = constant.IDLE_STATE
+                            self.now = 0
+
+                        elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
+                            time.sleep(1.33)
+                            self.ui.up(2)
+                            self.elevator_rack.floor += 1
+                            print('elevator current floor info :lower: ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
+                            self.elevator_rack.state = constant.DEEP_STATE
+
+
+                        elif(int(self.elevator_rack.floor) > int(self.destination_floor)):
+                            time.sleep(1.33)
+                            self.ui.down(2)
+                            self.elevator_rack.floor -= 1
+                            print('elevator current floor info :higher: ', self.elevator_rack.floor)
+                            self.elevator_rack.state = constant.DEEP_STATE
+                        """
+                        for i in range(0,len(self.dbn_calls)):
+                            self.dbn_calls.pop(i)
+                        """
 
 
 
@@ -473,6 +521,9 @@ class ElavatorThread3(threading.Thread):
         self.destination_floor = 0
 
         self.total_waiting =0
+        self.dbn_calls =[]
+        self.now = 0
+        self.now_min = 0
 
     def setDasom(self, uidasom):
         self.dasom =uidasom
@@ -577,8 +628,8 @@ class ElavatorThread3(threading.Thread):
                             registertime = datetime.datetime.strptime(dateSplit[0], "%Y-%m-%d %H:%M:%S")
 
 
-                            regist_sec = registertime.hour*3600 + registertime.minute *60 +registertime.second
-                            getin_sec = self.dialog.timer[2]  + self.dialog.timer[1] *60 + self.dialog.timer[0] * 3600
+                            regist_sec = registertime.hour*3600 + registertime.minute*60 + registertime.second
+                            getin_sec = self.dialog.timer[2]  + self.dialog.timer[1]*60 + self.dialog.timer[0] * 3600
 
                             self.elevator_rack.ready_calls[0].setwaiting(regist_sec,getin_sec)
                             #self.elevator_rack.ready_calls[0].waiting
@@ -641,17 +692,51 @@ class ElavatorThread3(threading.Thread):
                         # 10 분 을 그 시간에 더해주고 그 사이에 콜이 있는지 검사
                         time.sleep(5)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                         self.ui.showcall( 2,self.elevator_rack.ready_calls[0].departure ,self.elevator_rack.ready_calls[0].destination, 'IDLE')
-                        self.elevator_rack.ready_calls.pop(0)
+                        self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
                         self.elevator_rack.state = constant.IDLE_STATE
 
+                        self.now = self.dialog.timer[2]
+                        self.now_min = self.dialog.timer[1]
+
+
             else:
-                self.elevator_rack.state = constant.IDLE_STATE
+                if(self.now == 0):
+                    print("now가 0일때")
+                    #self.now = time.localtime()
+                    self.now = self.dialog.timer[2]
+                    self.now_min = self.dialog.timer[1]
+                    time.sleep(1)
+                else:
 
-                # 여기에서 시간이 십분이 넘으면 안되는거잖
-                # if - 더하기 10분 한 그 시간보다
-                # 그 시간이 지나면 - > 딥러닝 알고리즘을 빠지면
-                # print('no value ')
+                    #if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
+                    if self.dialog.timer[1]*60 +self.dialog.timer[2] >= self.now_min*60 + self.now+20 :
+                        print("20초가 지났을 때")
+                        #print self.dbn_calls[-1]매개변수로 넣기
+                        if(len(self.dbn_calls)!=0):
+                            self.destination_floor = 3
 
+                        if(int(self.elevator_rack.floor) == int(self.destination_floor)):
+                            self.elevator_rack.state = constant.IDLE_STATE
+                            self.now = 0
+
+                        elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
+                            time.sleep(1.33)
+                            self.ui.up(3)
+                            self.elevator_rack.floor += 1
+                            print('elevator current floor info :lower: ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
+                            self.elevator_rack.state = constant.DEEP_STATE
+
+
+                        elif(int(self.elevator_rack.floor) > int(self.destination_floor)):
+                            time.sleep(1.33)
+                            self.ui.down(3)
+                            self.elevator_rack.floor -= 1
+                            print('elevator current floor info :higher: ', self.elevator_rack.floor)
+                            self.elevator_rack.state = constant.DEEP_STATE
+                        """
+                        for i in range(0,len(self.dbn_calls)):
+                            self.dbn_calls.pop(i)
+                        """
 
 
 class ElavatorThread4(threading.Thread):
@@ -671,6 +756,9 @@ class ElavatorThread4(threading.Thread):
         self.destination_floor = 0
 
         self.total_waiting = 0
+        self.dbn_calls = []
+        self.now =0
+        self.now_min =0
         #self.ui = getui.Getui()
 
     def setDasom(self, uidasom):
@@ -779,7 +867,7 @@ class ElavatorThread4(threading.Thread):
                             registertime = datetime.datetime.strptime(dateSplit[0], "%Y-%m-%d %H:%M:%S")
 
 
-                            regist_sec = registertime.hour*3600 + registertime.minute *60 +registertime.second
+                            regist_sec = registertime.hour*3600 + registertime.minute *60 + registertime.second
                             getin_sec = self.dialog.timer[2]  + self.dialog.timer[1] *60 + self.dialog.timer[0] * 3600
 
                             self.elevator_rack.ready_calls[0].setwaiting(regist_sec,getin_sec)
@@ -843,12 +931,51 @@ class ElavatorThread4(threading.Thread):
                         # 10 분 을 그 시간에 더해주고 그 사이에 콜이 있는지 검사
                         time.sleep(5)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                         self.ui.showcall( 3,self.elevator_rack.ready_calls[0].departure ,self.elevator_rack.ready_calls[0].destination, 'IDLE')
-                        self.elevator_rack.ready_calls.pop(0)
+                        #self.elevator_rack.ready_calls.pop(0)
+                        self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
                         self.elevator_rack.state = constant.IDLE_STATE
 
+                        self.now = self.dialog.timer[2]
+                        self.now_min = self.dialog.timer[1]
+
+
             else:
-                self.elevator_rack.state = constant.IDLE_STATE
-                # 여기에서 시간이 십분이 넘으면 안되는거잖
-                # if - 더하기 10분 한 그 시간보다
-                # 그 시간이 지나면 - > 딥러닝 알고리즘을 빠지면
-                # print('no value ')
+                if(self.now == 0):
+                    print("4 : now가 0일때")
+                    #self.now = time.localtime()
+                    self.now = self.dialog.timer[2]
+                    self.now_min = self.dialog.timer[1]
+                    time.sleep(1)
+                else:
+
+                    #if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
+                    if self.dialog.timer[1]*60 +self.dialog.timer[2] >= self.now_min*60 + self.now+20 :
+                        print("20초가 지났을 때", self.destination_floor)
+                        #print self.dbn_calls[-1]매개변수로 넣기
+
+                        #self.destination_floor = 3
+                        if(len(self.dbn_calls)!=0):
+                            self.destination_floor = 3
+
+                        if(int(self.elevator_rack.floor) == int(self.destination_floor)):
+                            self.elevator_rack.state = constant.IDLE_STATE
+                            self.now = 0
+
+                        elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
+                            time.sleep(1.33)
+                            self.ui.up(4)
+                            self.elevator_rack.floor += 1
+                            print('elevator current floor info :lower: ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
+                            self.elevator_rack.state = constant.DEEP_STATE
+
+
+                        elif(int(self.elevator_rack.floor) > int(self.destination_floor)):
+                            time.sleep(1.33)
+                            self.ui.down(4)
+                            self.elevator_rack.floor -= 1
+                            print('elevator current floor info :higher: ', self.elevator_rack.floor)
+                            self.elevator_rack.state = constant.DEEP_STATE
+                        """
+                        for i in range(0,len(self.dbn_calls)):
+                            self.dbn_calls.pop(i)
+                        """

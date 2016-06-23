@@ -5,6 +5,8 @@ import dataParsing as gdata
 import constant
 import math
 import random
+import time
+
 
 import call as c
 
@@ -40,8 +42,8 @@ class Readcalls(threading.Thread):
 
     def run(self):
         self.tn += 1 # 다음 투플로 넘긴다음에 와일문 돌리기
-        while(self.tn<100):
-            if self.tn <100:
+        while(self.tn<10000):
+            if self.tn <10000:
                 #dataSplit = gdata.dataSet[self.tn][0].split('.')
                 registertime = gdata.getData(self.tn) # gdata.datetime.datetime.strptime(dataSplit[0],"%Y-%m-%d %H:%M:%S")
 
@@ -55,10 +57,7 @@ class Readcalls(threading.Thread):
                     # 할당받은 엘리베이터의 배열에 넣겠다
                     self.elevator_rack[allocated_elevator].ready_calls.append(call)
                     self.tn += 1
-
-
-
-
+                time.sleep(0.4)
 
                 # 가지고 온 시간이 지난 시간의 것이면 pass
             # self.tn이 100번째가 넘어가면 나간다 와일문
@@ -97,7 +96,7 @@ class Readcalls(threading.Thread):
         print('departure_floor : ',new_call.departure, ' --> ' ,new_call.destination)
         self.elevator_calls.append(new_call)  # 나중에 waitingtime 계산할때 쓸라고 배열에 담아놓는다.
 
-        print( self.elevator_calls[0].departure + ' ::: departure')
+        #print( self.elevator_calls[0].departure + ' ::: departure')
 
         return new_call
 
