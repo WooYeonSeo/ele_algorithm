@@ -1,8 +1,8 @@
 import call
-import time
-c = call.Call(0,1,3,0,0)
-c2 = call.Call(0,2,4,0,0)
-c3 = call.Call(0,7,1,0,0)
+
+c = call.Call(0, 1, 3, 0, 0)
+c2 = call.Call(0, 2, 4, 0, 0)
+c3 = call.Call(0, 7, 1, 0, 0)
 
 
 def asc_destlist(list):

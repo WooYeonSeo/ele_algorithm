@@ -6,19 +6,13 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
-import time
-import elevatorMove as move
-import dataParsing
-
-
-import elevsim
-
 import threading
+import time
 
-import elevatorMove as eleMove
+from PyQt4 import QtCore, QtGui
 
-import ThreadEli
+import dataParsing
+import elevsim
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -57,7 +51,7 @@ class Ui_MainWindow(object):
 
         self.ui = ui
         print('dialog1 :: ',dialog)
-        self.elev = elevsim.Elevsim(ui,dialog)
+        self.elev = elevsim.Elevsim(ui, dialog)
 
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(1603, 905)

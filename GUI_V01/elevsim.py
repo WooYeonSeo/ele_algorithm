@@ -14,7 +14,6 @@ import constant
 import dataParsing as gdata
 import elevator
 import readcalls
-import simulator
 
 
 class Elevsim(object):

@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 import threading
-import simulator
-import dataParsing as gdata
-import constant
-import math
 
 import call as c
+import constant
+import dataParsing as gdata
 
 
 class Readcalls(threading.Thread):
@@ -174,7 +172,7 @@ class Readcalls(threading.Thread):
                 if (floor_term < self.current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때
                     self.current_floor_term = floor_term  # 층 차이를 업데이트한다
                     close_ele = index  # 할당하는 엘레베이터 번호를 바꾼다.
-            elif (self.elevator_rack[index].state ==  constant.IDLE_STATE ):
+            elif (self.elevator_rack[index].state ==  constant.IDLE_STATE):
                 floor_term = abs(int(self.elevator_rack[index].floor) - int(call.departure))
                 print('floorterm 4: ', floor_term)
                 if (floor_term < self.current_floor_term):  # 제일 짧은 층 차이보다 더 층 차이가 짧을 때

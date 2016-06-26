@@ -4,7 +4,6 @@
 import constant
 #import poisson
 #import passnger as passenger
-import dataParsing as data
 
 
 class Elevator:
@@ -26,14 +25,14 @@ class Elevator:
         self.direction = constant.NO_DIRECTION # up, down, stop
         self.state = constant.IDLE_STATE
 
-        print(constant.MAX_FLOORS -1)
+        print(constant.MAX_FLOORS - 1)
 
         #self.poisson1 = poisson.Poisson()
         #poisson.Poisson.put_interval(self.poisson1, constant.MAX_FLOORS-1)#
 
         self.total_dyratuib =0.0
 
-        for idx1 in range(0,constant.MAX_FLOORS):
+        for idx1 in range(0, constant.MAX_FLOORS):
             self.pass_on_floor.append(0)
 
 

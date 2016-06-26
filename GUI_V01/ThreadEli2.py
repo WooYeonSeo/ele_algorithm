@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import threading
-import dataParsing as data
-import elevatorMove as move
-import simulator
 import time
+
 import constant
+import simulator
+
 
 def asc_destlist(list):
     return list.departure
