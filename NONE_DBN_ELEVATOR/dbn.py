@@ -58,11 +58,8 @@ def predict(call):
     print [value]
     predicted_values = predict_model([value])
 
-    print ("Predicted values for the first 10 examples in test set: ", str(call.register_time))
+    print ("Predicted values for the first 10 examples in test set:")
     print predicted_values[0]
-
-
-
     return predicted_values[0]
 
 """

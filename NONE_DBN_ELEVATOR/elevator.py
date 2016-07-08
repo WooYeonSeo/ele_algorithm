@@ -15,7 +15,6 @@ class Elevator:
 
         self.ready_calls = []
         self.destination_list =[]
-        self.record_calls = []
         self.destination = 0
 
 

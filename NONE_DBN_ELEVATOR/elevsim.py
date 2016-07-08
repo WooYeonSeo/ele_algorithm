@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import Elevator1
-import Elevator2
-import  Elevator4
-import Elevator3
+
+
 # import elevsupp
 # import display
 # import sys
@@ -17,8 +15,6 @@ import dataParsing as gdata
 import elevator
 import readcalls
 import simulator
-
-import record as re
 
 
 class Elevsim(object):
@@ -36,10 +32,6 @@ class Elevsim(object):
         self.last_floor = []  # 마지막 층 : 최근층
 
         self.floor_passengers = []  # 엘베 승객수
-
-        self.re = re.Record()
-
-        self.f = open("record_data.txt", 'w')
 
         for index in range(0, constant.MAX_ELEVATORS):  # 메인에서 max elevators - 4 정의
             self.elevator_rack.append(None)  # null값 넣어야 됨, elevator_rack -
@@ -114,44 +106,41 @@ class Elevsim(object):
 
 
 
-        t1 = Elevator1.ElavatorThread1()
+        t1 = ThreadEli2.ElavatorThread1()
         t1.setUI(self.ui)
         t1.setDasom(self.tn)
         t1.setDialog(self.dialog)
-        t1.setElevator_rack(self.elevator_rack[0] , self.re )
+        t1.setElevator_rack(self.elevator_rack[0])
 
-        t2 = Elevator2.ElavatorThread2()
+        t2 = ThreadEli2.ElavatorThread2()
         t2.setUI(self.ui)
         t2.setDasom(self.tn)
         t2.setDialog(self.dialog)
-        t2.setElevator_rack(self.elevator_rack[1], self.re)
+        t2.setElevator_rack(self.elevator_rack[1])
 
-        t3 = Elevator3.ElavatorThread3()
+        t3 = ThreadEli2.ElavatorThread3()
         t3.setUI(self.ui)
         t3.setDasom(self.tn)
         t3.setDialog(self.dialog)
-        t3.setElevator_rack(self.elevator_rack[2], self.re)
+        t3.setElevator_rack(self.elevator_rack[2])
 
-        t4 = Elevator4.ElavatorThread4()
+        t4 = ThreadEli2.ElavatorThread4()
         t4.setUI(self.ui)
         t4.setDasom(self.tn)
         t4.setDialog(self.dialog)
-        t4.setElevator_rack(self.elevator_rack[3], self.re)
-
-        readcall = readcalls.Readcalls()
-        readcall.setDaemon(True)
-        readcall.setUI(self.ui)
-        readcall.setDialog(self.dialog)
-        readcall.settn(self.tn)
-        readcall.setcalllist(self.elevator_calls)
-        readcall.setElevator_rack(self.elevator_rack,t1,t2,t3,t4)
+        t4.setElevator_rack(self.elevator_rack[3])
 
         t1.start()
         t2.start()
         t3.start()
         t4.start()
 
-
+        readcall = readcalls.Readcalls()
+        readcall.setUI(self.ui)
+        readcall.setDialog(self.dialog)
+        readcall.settn(self.tn)
+        readcall.setcalllist(self.elevator_calls)
+        readcall.setElevator_rack(self.elevator_rack,t1,t2,t3,t4)
         readcall.start()
 
 
@@ -187,7 +176,10 @@ class Elevsim(object):
         weekend = gdata.dataSet[tn][7] # 수정
         register15min = gdata.dataSet[tn][8]
 
-
+        # call생성
+        # registertime,departurefloor,destinationfloor,el_idatfield,waitingtime,ridingtime,servicetime,6
+        # registertime_year,registertime_quarter,registertime_month,registertime_day,registertime_hour,registertime_dayofweek, 12
+        # iserroroccured,isup,registertime_30min,registertime_15min,registertime_5min 17
 
         # register_time, departure_floor,destination_floor, isup, passenger, dbn_register_time, day_of_week, iserror, weekend, register15min):
         new_call = c.Call(registertime, departure_floor, destination_floor, is_up, passenger, dbn_register_time,day_of_week,iserror,weekend, register15min)  # 1이 up, 0이 down

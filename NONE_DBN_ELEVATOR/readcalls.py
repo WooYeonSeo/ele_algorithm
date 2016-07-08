@@ -17,8 +17,6 @@ class Readcalls(threading.Thread):
        self.threadFlag = [0]*4
 
 
-
-
    def settn(self, tn):
        self.tn = tn
 
@@ -28,8 +26,6 @@ class Readcalls(threading.Thread):
        self.t2 = t2
        self.t3 = t3
        self.t4 = t4
-
-
 
    def setUI(self, uiUI):
        self.ui = uiUI
@@ -45,10 +41,11 @@ class Readcalls(threading.Thread):
 
    def run(self):
        self.tn += 1  # 다음 투플로 넘긴다음에 와일문 돌리기
-       while (1):
-           if self.tn < 170000:
+       while (self.tn < 10000):
+           if self.tn < 10000:
                # dataSplit = gdata.dataSet[self.tn][0].split('.')
-               registertime = gdata.getData(self.tn)  # gdata.datetime.datetime.strptime(dataSplit[0],"%Y-%m-%d %H:%M:%S")
+               registertime = gdata.getData(
+                   self.tn)  # gdata.datetime.datetime.strptime(dataSplit[0],"%Y-%m-%d %H:%M:%S")
 
                if self.dialog.timer[2] == registertime.second and self.dialog.timer[1] == registertime.minute and \
                                self.dialog.timer[0] == registertime.hour:
@@ -65,19 +62,8 @@ class Readcalls(threading.Thread):
                    # 할당받은 엘리베이터의 배열에 넣겠다
                    self.elevator_rack[allocated_elevator].ready_calls.append(call)
                    self.tn += 1
-                   print("E1_stop  : ", self.t1._stop.isSet(), "E2_stop  : ", self.t2._stop.isSet(),"E3_stop  : ", self.t3._stop.isSet(), "E4_stop : ", self.t4._stop.isSet())
 
                     # 1이면 즉시 리턴해 주는 함수 : 기본이 0이므로 기다린다. set - run :  clear - stop
-                   if allocated_elevator == 0:
-                       self.t1._stop.set() # return
-                   if allocated_elevator == 1:
-                       self.t2._stop.set() # return
-                   if allocated_elevator == 2:
-                       self.t3._stop.set() # return
-                   if allocated_elevator == 4:
-                       self.t4._stop.set() # return
-
-                   """
                    for i in range(0, 4):
                        # 콜이 없는데 실행중이면 멈추고 스탑으로flag=1바꿈
                        if (i == 0):
@@ -122,18 +108,13 @@ class Readcalls(threading.Thread):
                                print('EL4 콜이 있는데 ')
                                self.t4._stop.set()
                                #self.threadFlag[i] = 0
-                    """
                time.sleep(0.1)
-
-
 
 
                # 가지고 온 시간이 지난 시간의 것이면 pass
            # self.tn이 100번째가 넘어가면 나간다 와일문
            else:
                break
-
-
 
    def getcall(self, tn):  # ui객체를 받아와야 된다
        # index = 0

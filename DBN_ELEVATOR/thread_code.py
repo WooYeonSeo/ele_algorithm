@@ -5,7 +5,7 @@ import simulator
 import time
 import constant
 import datetime
-#import dbn
+import dbn
 
 def asc_destlist(list):
     return list.departure
@@ -204,48 +204,83 @@ class ElavatorThread1(threading.Thread):
                             time.sleep(1.33)
                             self.ui.down(1)
                             self.elevator_rack.floor -= 1
-                            print('elevator current floor info :higher: ', self.elevator_rack.floor)
+                            print('1elevator current floor info :higher: ', self.elevator_rack.floor)
                             self.elevator_rack.state = constant.LOAD_STATE
                             # self.dests.append(self.elevator_rack.ready_calls.pop())
 
                     # 사람을 태우려고 멈추었을 때. 또는 동작을 만족하였을때.
                     if(self.elevator_rack.state == constant.STOP_STATE):
-                        print('people get in…')
+                        print('1people get in…')
 
+                        self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
                         # 시간 가지고 와서 - + 10분
 
                         # 10 분 을 그 시간에 더해주고 그 사이에 콜이 있는지 검사
-                        time.sleep(5)#가지고 온 사람 타는 시간만틈 더해서 슬립)
-                        self.ui.showcall( 0,self.elevator_rack.ready_calls[0].departure ,self.elevator_rack.ready_calls[0].destination, 'IDLE')
-                        self.elevator_rack.ready_calls.pop(0)
-                        #self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
+
+
+                        time.sleep(2)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                         self.elevator_rack.state = constant.IDLE_STATE
-
-                        self.now = self.dialog.timer[2]
-                        self.now_min = self.dialog.timer[1]
-
-
 
             else:
                 self.elevator_rack.state = constant.IDLE_STATE
-                if(self.now == 0):
-                    print("E1 now가 0일때")
-                    #self.now = time.localtime()
-                    #self.now = self.dialog.timer[2]
-                    #self.now_min = self.dialog.timer[1]
-                    time.sleep(1)
+                # 여기에서 시간이 십분이 넘으면 안되는거잖
+                # if - 더하기 10분 한 그 시간보다
+                # 그 시간이 지나면 - > 딥러닝 알고리즘을 빠지면
+                # print('no value ')
 
+                if(self.now == 0):
+                    print("1now가 0일때")
+                    self.now = time.localtime()
                 else:
 
-                    #if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
-                    if self.dialog.timer[1]*60 +self.dialog.timer[2] >= self.now_min*60 + self.now+20 :
-                            print('suspended :')
-                            self.now = 0
-                            # 여기서 쓰레드 stop
-                            #self.__suspend = True
-                            self._stop.clear() #0 으로 바꾸고 기다리라고 한다.
-                            self._stop.wait() # 1이면 즉시 리턴해 주는 함수 : 기본이 0이므로 기다린다.
-                            print('E1 suspended FREE:')
+                    if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
+                        #print("120초가 지났을 때")
+                        #print self.dbn_calls[-1]매개변수로 넣기
+                        if(len(self.dbn_calls)!=0):
+
+                            self.destination_floor = dbn.predict(self.dbn_calls.pop(-1))
+                            """
+                            for i in range(0,len(self.dbn_calls)):
+                                self.dbn_calls.pop(i)
+                            """
+
+                            if(int(self.elevator_rack.floor) == int(self.destination_floor) ):
+                                print('1dbn__ThreadEli2 :: arrived at calls destination floor ' )
+                                print('1dbn__ThreadEli2 :: people get in and out...')
+                                print('1dbn__elevator current floor info :equal: ', self.elevator_rack.floor)
+                                # 제일 앞에 꺼 제거거
+
+
+                                # 출발 목적층에 도착하였으니 멈춤 상태로 전환
+                                self.elevator_rack.state = constant.IDLE_STATE
+                                # 사람이 타고 내리는 시간 sleep
+                                #time.sleep(2)
+                                self.now = 0
+
+                            elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
+
+                                #time.sleep(1.33)
+                                self.ui.up(1)
+                                self.elevator_rack.floor += 1
+
+                                print('1dbn___elevator current floor info :lower: ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
+
+                                self.elevator_rack.state = constant.LOAD_STATE
+
+                                #destination_list.sort(key=asc_destlist, reverse=True)
+                                # 지금 층이랑 디파처플로어 목록중에 출발층이랑 같니?
+                                #for i in range(0,3):
+                                #print('desti list : ' ,self.departure_floors[0].departure)
+
+                                #self.dests.append(self.elevator_rack.ready_calls.pop())
+
+                            elif(int(self.elevator_rack.floor) > int(self.destination_floor)):
+                                time.sleep(1.33)
+                                self.ui.down(1)
+                                self.elevator_rack.floor -= 1
+                                print('1dbn__elevator current floor info :higher: ', self.elevator_rack.floor)
+                                self.elevator_rack.state = constant.LOAD_STATE
+                                # self.dests.append(self.elevator_rack.ready_calls.pop())
 
 
 
@@ -436,45 +471,69 @@ class ElavatorThread2(threading.Thread):
                             time.sleep(1.33)
                             self.ui.down(2)
                             self.elevator_rack.floor -= 1
-                            print('elevator current floor info :higher: ', self.elevator_rack.floor)
+                            print('2elevator current floor info :higher: ', self.elevator_rack.floor)
                             self.elevator_rack.state = constant.LOAD_STATE
                             # self.dests.append(self.elevator_rack.ready_calls.pop())
 
                     # 사람을 태우려고 멈추었을 때. 또는 동작을 만족하였을때.
                     if(self.elevator_rack.state == constant.STOP_STATE):
-                        print('people get in…')
+                        print('2people get in…')
 
-                        # 시간 가지고 와서 - + 10분
+                        self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
 
-                        # 10 분 을 그 시간에 더해주고 그 사이에 콜이 있는지 검사
-                        time.sleep(5)#가지고 온 사람 타는 시간만틈 더해서 슬립)
-                        self.ui.showcall( 1,self.elevator_rack.ready_calls[0].departure ,self.elevator_rack.ready_calls[0].destination, 'IDLE')
-                        #self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
-                        self.elevator_rack.ready_calls.pop(0)
+
+                        time.sleep(2)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                         self.elevator_rack.state = constant.IDLE_STATE
 
             else:
                 self.elevator_rack.state = constant.IDLE_STATE
+                # print('no value ')
                 if(self.now == 0):
-                    print("E2 now가 0일때")
-                    #self.now = time.localtime()
-                    #self.now = self.dialog.timer[2]
-                    #self.now_min = self.dialog.timer[1]
-                    time.sleep(1)
-
+                    print("2now가 0일때")
+                    self.now = time.localtime()
                 else:
 
-                    #if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
-                    if self.dialog.timer[1]*60 +self.dialog.timer[2] >= self.now_min*60 + self.now+20 :
-                            print('E2 suspended :')
-                            self._stop.clear() #0 으로 바꾸고 기다리라고 한다.
-                            while not self._stop.isSet():
-                                self.now = 0
-                                # 여기서 쓰레드 stop
-                                #self.__suspend = True
-                                self._stop.wait() # 1이면 즉시 리턴해 주는 함수 : 기본이 0이므로 기다린다.
-                                print('E2 suspended FREE:')
+                    if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
+                        #print("220초가 지났을 때")
+                        #print self.dbn_calls[-1]매개변수로 넣기
+                        if(len(self.dbn_calls)!=0):
 
+                            self.destination_floor = dbn.predict(self.dbn_calls.pop(-1))
+                            """
+                            for i in range(0,len(self.dbn_calls)):
+                                self.dbn_calls.pop(i)
+                            """
+
+                            if(int(self.elevator_rack.floor) == int(self.destination_floor) ):
+                                print('2dbn__ThreadEli2 :: arrived at calls destination floor ' )
+                                print('2dbn__ThreadEli2 :: people get in and out...')
+                                print('2dbn__elevator current floor info :equal: ', self.elevator_rack.floor)
+                                # 제일 앞에 꺼 제거거
+
+
+                                # 출발 목적층에 도착하였으니 멈춤 상태로 전환
+                                self.elevator_rack.state = constant.IDLE_STATE
+                                # 사람이 타고 내리는 시간 sleep
+                                #time.sleep(2)
+                                self.now = 0
+
+                            elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
+
+                                #time.sleep(1.33)
+                                self.ui.up(2)
+                                self.elevator_rack.floor += 1
+
+                                print('2dbn___2elevator current floor info :lower: ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
+
+                                self.elevator_rack.state = constant.LOAD_STATE
+
+                            elif(int(self.elevator_rack.floor) > int(self.destination_floor)):
+                                #time.sleep(1.33)
+                                self.ui.down(2)
+                                self.elevator_rack.floor -= 1
+                                print('2dbn__2elevator current floor info :higher: ', self.elevator_rack.floor)
+                                self.elevator_rack.state = constant.LOAD_STATE
+                                # self.dests.append(self.elevator_rack.ready_calls.pop())
 
 
 
@@ -504,6 +563,8 @@ class ElavatorThread3(threading.Thread):
         self.dbn_calls =[]
         self.now = 0
         self.now_min = 0
+
+        self.dbn_calls = []
 
     def setDasom(self, uidasom):
         self.dasom =uidasom
@@ -664,48 +725,75 @@ class ElavatorThread3(threading.Thread):
                             time.sleep(1.33)
                             self.ui.down(3)
                             self.elevator_rack.floor -= 1
-                            print('elevator current floor info :higher: ', self.elevator_rack.floor)
+                            print('3elevator current floor info :higher: ', self.elevator_rack.floor)
                             self.elevator_rack.state = constant.LOAD_STATE
                             # self.dests.append(self.elevator_rack.ready_calls.pop())
 
                     # 사람을 태우려고 멈추었을 때. 또는 동작을 만족하였을때.
                     if(self.elevator_rack.state == constant.STOP_STATE):
-                        print('people get in…')
+                        print('3people get in…')
 
-                        # 시간 가지고 와서 - + 10분
+                        self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
 
-                        # 10 분 을 그 시간에 더해주고 그 사이에 콜이 있는지 검사
-                        time.sleep(5)#가지고 온 사람 타는 시간만틈 더해서 슬립)
-                        self.ui.showcall( 2,self.elevator_rack.ready_calls[0].departure ,self.elevator_rack.ready_calls[0].destination, 'IDLE')
-                        #self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
-                        self.elevator_rack.ready_calls.pop(0)
+
+                        time.sleep(2)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                         self.elevator_rack.state = constant.IDLE_STATE
-
-                        self.now = self.dialog.timer[2]
-                        self.now_min = self.dialog.timer[1]
-
-
             else:
                 self.elevator_rack.state = constant.IDLE_STATE
+                # print('no value ')
                 if(self.now == 0):
-                    print("E3 now가 0일때")
-                    #self.now = time.localtime()
-                    #self.now = self.dialog.timer[2]
-                    #self.now_min = self.dialog.timer[1]
-                    time.sleep(1)
-
+                    print("3now가 0일때")
+                    self.now = time.localtime()
                 else:
 
-                    #if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
-                    if self.dialog.timer[1]*60 +self.dialog.timer[2] >= self.now_min*60 + self.now+20 :
-                            print('E3 suspended :')
-                            self.now = 0
-                            # 여기서 쓰레드 stop
-                            #self.__suspend = True
-                            self._stop.clear() #0 으로 바꾸고 기다리라고 한다.
-                            self._stop.wait() # 1이면 즉시 리턴해 주는 함수 : 기본이 0이므로 기다린다.
-                            print('E3 suspended FREE:')
+                    if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
+                        #print("320초가 지났을 때")
+                        #print self.dbn_calls[-1]매개변수로 넣기
+                        if(len(self.dbn_calls)!=0):
 
+                            self.destination_floor = dbn.predict(self.dbn_calls.pop(-1))
+                            """
+                            for i in range(0,len(self.dbn_calls)):
+                                self.dbn_calls.pop(i)
+                            """
+
+                            if(int(self.elevator_rack.floor) == int(self.destination_floor) ):
+                                print('3dbn__ThreadEli2 :: arrived at calls destination floor ' )
+                                print('3dbn__ThreadEli2 :: people get in and out...')
+                                print('3dbn__elevator current floor info :equal: ', self.elevator_rack.floor)
+                                # 제일 앞에 꺼 제거거
+
+
+                                # 출발 목적층에 도착하였으니 멈춤 상태로 전환
+                                self.elevator_rack.state = constant.IDLE_STATE
+                                # 사람이 타고 내리는 시간 sleep
+                                #time.sleep(2)
+                                self.now = 0
+
+                            elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
+
+                                #time.sleep(1.33)
+                                self.ui.up(3)
+                                self.elevator_rack.floor += 1
+
+                                print('3dbn___elevator current floor info :lower: ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
+
+                                self.elevator_rack.state = constant.LOAD_STATE
+
+                                #destination_list.sort(key=asc_destlist, reverse=True)
+                                # 지금 층이랑 디파처플로어 목록중에 출발층이랑 같니?
+                                #for i in range(0,3):
+                                #print('desti list : ' ,self.departure_floors[0].departure)
+
+                                #self.dests.append(self.elevator_rack.ready_calls.pop())
+
+                            elif(int(self.elevator_rack.floor) > int(self.destination_floor)):
+                                #time.sleep(1.33)
+                                self.ui.down(3)
+                                self.elevator_rack.floor -= 1
+                                print('3dbn__elevator current floor info :higher: ', self.elevator_rack.floor)
+                                self.elevator_rack.state = constant.LOAD_STATE
+                                # self.dests.append(self.elevator_rack.ready_calls.pop())
 
 
 
@@ -732,6 +820,9 @@ class ElavatorThread4(threading.Thread):
         self.dbn_calls = []
         self.now =0
         self.now_min =0
+
+
+        self.dbn_calls = []
         #self.ui = getui.Getui()
 
     def setDasom(self, uidasom):
@@ -909,7 +1000,7 @@ class ElavatorThread4(threading.Thread):
                         # 10 분 을 그 시간에 더해주고 그 사이에 콜이 있는지 검사
                         time.sleep(5)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                         self.ui.showcall( 3,self.elevator_rack.ready_calls[0].departure ,self.elevator_rack.ready_calls[0].destination, 'IDLE')
-                        self.elevator_rack.ready_calls.pop(0)
+                        self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
                         #self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
                         self.elevator_rack.state = constant.IDLE_STATE
 
@@ -920,23 +1011,59 @@ class ElavatorThread4(threading.Thread):
             else:
                 self.elevator_rack.state = constant.IDLE_STATE
                 if(self.now == 0):
-                    print("E4 now가 0일때")
-                    #self.now = time.localtime()
-                    #self.now = self.dialog.timer[2]
-                    #self.now_min = self.dialog.timer[1]
-                    time.sleep(1)
-
+                    print("4now가 0일때")
+                    self.now = time.localtime()
                 else:
 
-                    #if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
-                    if self.dialog.timer[1]*60 +self.dialog.timer[2] >= self.now_min*60 + self.now+20 :
-                            print('E4 suspended :')
-                            self._stop.clear() #0 으로 바꾸고 기다리라고 한다.
-                            self.now = 0
-                            # 여기서 쓰레드 stop
-                            #self.__suspend = True
-                            self._stop.wait() # 1이면 즉시 리턴해 주는 함수 : 기본이 0이므로 기다린다.
-                            print('E4 suspended FREE:')
+                    if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
+                        #print("420초가 지났을 때")
+                        #print self.dbn_calls[-1]매개변수로 넣기
+                        if(len(self.dbn_calls)!=0):
+
+                            self.destination_floor = dbn.predict(self.dbn_calls.pop(-1))
+                            """
+                            for i in range(0,len(self.dbn_calls)):
+                                self.dbn_calls.pop(i)
+                            """
+
+                            if(int(self.elevator_rack.floor) == int(self.destination_floor) ):
+                                print('4dbn__ThreadEli2 :: arrived at calls destination floor ' )
+                                print('4dbn__ThreadEli2 :: people get in and out...')
+                                print('4dbn__elevator current floor info :equal: ', self.elevator_rack.floor)
+                                # 제일 앞에 꺼 제거거
+
+
+                                # 출발 목적층에 도착하였으니 멈춤 상태로 전환
+                                self.elevator_rack.state = constant.IDLE_STATE
+                                # 사람이 타고 내리는 시간 sleep
+                                #time.sleep(2)
+                                self.now = 0
+
+                            elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
+
+                                #time.sleep(1.33)
+                                self.ui.up(4)
+                                self.elevator_rack.floor += 1
+
+                                print('4dbn___elevator current floor info :lower: ', self.elevator_rack.floor, ' int(self.destination_floor)  :: ',int(self.destination_floor))
+
+                                self.elevator_rack.state = constant.LOAD_STATE
+
+                                #destination_list.sort(key=asc_destlist, reverse=True)
+                                # 지금 층이랑 디파처플로어 목록중에 출발층이랑 같니?
+                                #for i in range(0,3):
+                                #print('desti list : ' ,self.departure_floors[0].departure)
+
+                                #self.dests.append(self.elevator_rack.ready_calls.pop())
+
+                            elif(int(self.elevator_rack.floor) > int(self.destination_floor)):
+                                #time.sleep(1.33)
+                                self.ui.down(4)
+                                self.elevator_rack.floor -= 1
+                                print('4dbn__elevator current floor info :higher: ', self.elevator_rack.floor)
+                                self.elevator_rack.state = constant.LOAD_STATE
+                                # self.dests.append(self.elevator_rack.ready_calls.pop())
+
 
 
 

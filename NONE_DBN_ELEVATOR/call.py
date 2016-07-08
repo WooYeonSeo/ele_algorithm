@@ -19,12 +19,10 @@ class Call(object):
         self.duration = 0 # 운행되는 초를 담는 곳
 
         self.regist_sec =0
-
         self.getin_sec = 0
         self.getout_sec = 0 # 타고 도착해서 내리는 시간까지
 
         self.waiting = 0
-        self.riding = 0
 
 
         self.dbn_register_time = dbn_register_time
@@ -44,14 +42,8 @@ class Call(object):
         self.duration += 3
 
     def setwaiting(self,regist ,getin):
-
-        self.waiting =  getin -regist
+        self.waiting = regist - getin
         self.regist_sec = regist
         self.getin_sec = getin
-
-    def setriding(self,getout ,getin):
-        self.riding = getout - getin
-        self.getout_sec = getout
-
 
 

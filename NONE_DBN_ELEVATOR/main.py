@@ -15,7 +15,7 @@ except AttributeError:
         return QtGui.QApplication.translate(context, text, disambig)
 
 import simulator
-
+import getui
 import dialog
 import dataParsing
 import stopwatch
