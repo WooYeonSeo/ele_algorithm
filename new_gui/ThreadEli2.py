@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-import threading
-import getui
-import simulator
-import time
-import constant
 import datetime
-import dbn
+import threading
+import time
+
+import constant
+
 
 def asc_destlist(list):
     return list.departure
@@ -228,8 +227,8 @@ class ElavatorThread1(threading.Thread):
                 if(self.now == 0):
                     print("E1 now가 0일때")
                     #self.now = time.localtime()
-                    #self.now = self.dialog.timer[2]
-                    #self.now_min = self.dialog.timer[1]
+                    self.now = self.dialog.timer[2]
+                    self.now_min = self.dialog.timer[1]
                     time.sleep(1)
 
                 else:
@@ -249,9 +248,11 @@ class ElavatorThread1(threading.Thread):
                             self.now = 0
                             # 여기서 쓰레드 stop
                             #self.__suspend = True
+                            print('E1 presuspended :')
+                            self._stop.clear()
                             self._stop.wait() # 1이면 즉시 리턴해 주는 함수 : 기본이 0이므로 기다린다.
 
-                            print('suspended :')
+                            print('E1 suspended :')
 
                         elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
                             time.sleep(1.33)
@@ -329,12 +330,6 @@ class ElavatorThread2(threading.Thread):
 
             #if(self.elevator_rack.ready_calls[0] != None or len(self.dests) != 0):
             if(len(self.elevator_rack.ready_calls) != 0 ):
-                # print(self.elevator_rack.ready_calls[0].departure)
-                #  엘레베이터의 스테이트를 계속 확인하는 while문
-                # while(1):
-                    # 1. idle 일 때 - 첫번째 콜을 받아서 목적층 콜리스트에 넣고 운행상태로 바꾼다
-                    # if( len(self.elevator_rack.ready_calls) == 1):
-                    #    print('one value : ', len(self.elevator_rack.ready_calls))
 
                     if(self.elevator_rack.state == constant.IDLE_STATE):
                         print('____IDLE STATE1___', self.elevator_rack.ready_calls[0].departure ,'->', self.elevator_rack.ready_calls[0].destination )
@@ -489,17 +484,22 @@ class ElavatorThread2(threading.Thread):
 
                     #if(self.now.tm_min == time.localtime().tm_min and self.now.tm_sec+20 <= time.localtime().tm_sec):
                     if self.dialog.timer[1]*60 +self.dialog.timer[2] >= self.now_min*60 + self.now+20 :
-                        print("20초가 지났을 때")
+                        print("E2 20초가 지났을 때")
                         #print self.dbn_calls[-1]매개변수로 넣기
-                        if(len(self.dbn_calls)!=0):
-                            self.destination_floor = 3
+                        self.destination_floor = 3
+                        #if(len(self.dbn_calls)!=0):
+                        #    self.destination_floor = 3
                             #for i in range(0,len(self.dbn_calls)):
                             #    self.dbn_calls.pop(i)
 
                         if(int(self.elevator_rack.floor) == int(self.destination_floor)):
                             self.elevator_rack.state = constant.IDLE_STATE
                             self.now = 0
+                            print('E2 presuspended :')
+                            self._stop.clear()
                             self._stop.wait() # 1이면 즉시 리턴해 주는 함수 : 기본이 0이므로 기다린다.
+
+                            print('E2 suspended  :')
 
                         elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
                             time.sleep(1.33)
@@ -721,6 +721,7 @@ class ElavatorThread3(threading.Thread):
                         time.sleep(5)#가지고 온 사람 타는 시간만틈 더해서 슬립)
                         self.ui.showcall( 2,self.elevator_rack.ready_calls[0].departure ,self.elevator_rack.ready_calls[0].destination, 'IDLE')
                         #self.dbn_calls.append(self.elevator_rack.ready_calls.pop(0))
+                        #self.elevator_rack.ready_calls.pop(0)
                         self.elevator_rack.ready_calls.pop(0)
                         self.elevator_rack.state = constant.IDLE_STATE
 
@@ -741,6 +742,7 @@ class ElavatorThread3(threading.Thread):
                     if self.dialog.timer[1]*60 + self.dialog.timer[2] >= self.now_min*60 + self.now+20 :
                         print("E3 20초가 지났을 때")
                         #print self.dbn_calls[-1]매개변수로 넣기
+                        self.destination_floor = 3
                         if(len(self.dbn_calls)!=0):
                             self.destination_floor = 3#dbn.predict(self.dbn_calls.pop(-1))
                             #for i in range(0,len(self.dbn_calls)):
@@ -749,7 +751,11 @@ class ElavatorThread3(threading.Thread):
                         if(int(self.elevator_rack.floor) == int(self.destination_floor)):
                             self.elevator_rack.state = constant.IDLE_STATE
 
+                            print('E1 presuspended :')
+                            self._stop.clear()
                             self._stop.wait() # 1이면 즉시 리턴해 주는 함수 : 기본이 0이므로 기다린다.
+
+                            print('E1 suspended :')
                             self.now = 0
 
                         elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
@@ -994,7 +1000,7 @@ class ElavatorThread4(threading.Thread):
                         print("E4 20sec passed", self.destination_floor)
                         #print self.dbn_calls[-1]매개변수로 넣기
 
-                        #self.destination_floor = 3
+                        self.destination_floor = 3
                         if(len(self.dbn_calls)!=0):
                             self.destination_floor = 3
                             #for i in range(0,len(self.dbn_calls)):
@@ -1002,7 +1008,10 @@ class ElavatorThread4(threading.Thread):
 
                         if(int(self.elevator_rack.floor) == int(self.destination_floor)):
                             self.elevator_rack.state = constant.IDLE_STATE
+                            print('E4 presuspended :')
+                            self._stop.clear()
                             self._stop.wait() # 1이면 즉시 리턴해 주는 함수 : 기본이 0이므로 기다린다.
+                            print('E4 suspended :')
                             self.now = 0
 
                         elif(int(self.elevator_rack.floor) < int(self.destination_floor)):
@@ -1019,7 +1028,16 @@ class ElavatorThread4(threading.Thread):
                             self.elevator_rack.floor -= 1
                             print('elevator current floor info :higher: ', self.elevator_rack.floor)
                             self.elevator_rack.state = constant.DEEP_STATE
-                        """
-                        for i in range(0,len(self.dbn_calls)):
-                            self.dbn_calls.pop(i)
-                        """
+
+
+class check(threading.Thread):
+
+    def __init__(self, parent = None):
+        threading.Thread.__init__(self)
+        super(check, self).__init__()
+        self._run = threading.Event()
+
+
+    def run(self):
+        while(1):
+            time.sleep(50)

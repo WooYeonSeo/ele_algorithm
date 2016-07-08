@@ -6,6 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 import elevsim
+import elevcontrol
 from PyQt4 import QtCore, QtGui
 
 try:
@@ -36,7 +37,15 @@ class Ui_MainWindow(object):
 
         #self.ui = ui
         print('dialog1 :: ',dialog)
-        self.elev = elevsim.Elevsim(dialog)
+        #self.elev = elevsim.Elevsim(dialog)
+
+        self.elev = elevcontrol.Elevcontrol()
+        self.elev.setDialog(dialog)
+
+
+
+
+
         #self.thread = GUIThread()
         #self.thread.start()
 
@@ -505,7 +514,14 @@ class Ui_MainWindow(object):
         watch = stopwatch.StopWatch(self.dialog)
         watch.start()
 
-        self.elev.run(data, self.ui)
+        #self.elev.run(data, self.ui)
+
+
+        self.elev.settn(data)
+        self.elev.setDialog(self.dialog)
+
+        self.elev.setUI(self.ui)
+        self.elev.run()
 
 
 

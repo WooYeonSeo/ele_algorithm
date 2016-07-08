@@ -115,7 +115,7 @@ def generateData(yearText,monthText,dayText,hourText,minuteText,secondText):
     for i in range(0,tupleNum):
         # milisecond ¥ð?¢³¨¡¡¾?
         dateSplit = dataSet[i][0].split('.')
-        print dateSplit[0]
+        print dateSplit[0],"d"
 
         registertime = datetime.datetime.strptime(dateSplit[0], "%Y-%m-%d %H:%M:%S")
 

@@ -19,6 +19,7 @@ import simulator
 
 class Elevsim(object):
     def __init__(self, dialog):
+
         print("__elevsim__ \n")
         self.current_floor_term = 20
         # self.ui = simulator.ui.getUI()
@@ -107,33 +108,41 @@ class Elevsim(object):
 
 
         t1 = ThreadEli2.ElavatorThread1()
+        #t1.setDaemon(True)
         t1.setUI(self.ui)
         t1.setDasom(self.tn)
         t1.setDialog(self.dialog)
         t1.setElevator_rack(self.elevator_rack[0])
 
         t2 = ThreadEli2.ElavatorThread2()
+        #t2.setDaemon(True)
         t2.setUI(self.ui)
         t2.setDasom(self.tn)
         t2.setDialog(self.dialog)
         t2.setElevator_rack(self.elevator_rack[1])
 
         t3 = ThreadEli2.ElavatorThread3()
+        #t3.setDaemon(True)
         t3.setUI(self.ui)
         t3.setDasom(self.tn)
         t3.setDialog(self.dialog)
         t3.setElevator_rack(self.elevator_rack[2])
 
         t4 = ThreadEli2.ElavatorThread4()
+        #t4.setDaemon(True)
         t4.setUI(self.ui)
         t4.setDasom(self.tn)
         t4.setDialog(self.dialog)
         t4.setElevator_rack(self.elevator_rack[3])
 
+        ch = ThreadEli2.check()
+
+
         t1.start()
         t2.start()
         t3.start()
         t4.start()
+        ch.start()
 
         readcall = readcalls.Readcalls()
         readcall.setUI(self.ui)
